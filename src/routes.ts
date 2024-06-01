@@ -17,10 +17,6 @@ export const routes: IRoute[] = [
     key: 'dashboard',
     children: [
       {
-        name: 'menu.dashboard.workplace',
-        key: 'dashboard/workplace',
-      },
-      {
         name: 'menu.dashboard.monitor',
         key: 'dashboard/monitor',
         requiredPermissions: [

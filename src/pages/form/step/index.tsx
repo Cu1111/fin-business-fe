@@ -18,6 +18,8 @@ import locale from './locale';
 import styles from './style/index.module.less';
 
 const { Title, Paragraph } = Typography;
+const RangePicker: any = DatePicker.RangePicker;
+
 function StepForm() {
   const t = useLocale(locale);
   const [current, setCurrent] = useState(1);
@@ -114,7 +116,7 @@ function StepForm() {
                     },
                   ]}
                 >
-                  <DatePicker.RangePicker style={{ width: '100%' }} />
+                  <RangePicker style={{ width: '100%' }} />
                 </Form.Item>
                 <Form.Item
                   label={t['stepForm.basicInfo.link']}

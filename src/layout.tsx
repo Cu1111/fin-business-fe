@@ -175,10 +175,10 @@ function PageLayout() {
     setCollapsed((collapsed) => !collapsed);
   }
 
-  const paddingLeft = showMenu ? { paddingLeft: menuWidth } : {};
+  const paddingLeft = showMenu ? {} : {};
   const paddingTop = showNavbar ? { paddingTop: navbarHeight } : {};
   const paddingStyle = { ...paddingLeft, ...paddingTop };
-  
+
   function updateMenuStatus() {
     const pathKeys = pathname.split('/');
     const newSelectedKeys: string[] = [];

@@ -17,6 +17,8 @@ import styles from './style/index.module.less';
 
 const { Row, Col } = Grid;
 const { useForm } = Form;
+const RangePicker: any = DatePicker.RangePicker;
+
 
 function SearchForm(props: {
   onSearch: (values: Record<string, any>) => void;
@@ -98,7 +100,7 @@ function SearchForm(props: {
               label={t['searchTable.columns.createdTime']}
               field="createdTime"
             >
-              <DatePicker.RangePicker
+              <RangePicker
                 allowClear
                 style={{ width: '100%' }}
                 disabledDate={(date) => dayjs(date).isAfter(dayjs())}
