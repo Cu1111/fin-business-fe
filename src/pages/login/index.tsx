@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import Footer from '@/components/Footer';
 import Logo from '@/assets/logo.svg';
 import LoginForm from './form';
 import LoginBanner from './banner';
@@ -24,9 +23,6 @@ function Login() {
       <div className={styles.content}>
         <div className={styles['content-inner']}>
           <LoginForm />
-        </div>
-        <div className={styles.footer}>
-          <Footer />
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@
 const path = require('path');
 const {
   override,
+  overrideDevServer,
   addWebpackModuleRule,
   addWebpackPlugin,
   addWebpackAlias,
@@ -12,6 +13,16 @@ const setting = require('./src/settings.json');
 
 module.exports = {
   webpack: override(
+    (config) => {
+      const htmlPluginIndex = config.plugins.findIndex(
+        (plugin) => plugin.constructor.name === 'HtmlWebpackPlugin'
+      );
+      if (htmlPluginIndex >= 0) {
+        config.plugins[htmlPluginIndex].options.favicon =
+          './src/assets/logo.svg';
+      }
+      return config;
+    },
     addLessLoader({
       lessLoaderOptions: {
         lessOptions: {},
@@ -33,4 +44,10 @@ module.exports = {
       '@': path.resolve(__dirname, 'src'),
     })
   ),
+  devServer: overrideDevServer((config, env) => {
+    if (env === 'development') {
+      config.devServer.hot = false;
+    }
+    return config;
+  }),
 };

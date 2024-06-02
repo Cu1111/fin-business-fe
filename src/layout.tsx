@@ -18,7 +18,6 @@ import { useSelector } from 'react-redux';
 import qs from 'query-string';
 import NProgress from 'nprogress';
 import Navbar from './components/NavBar';
-import Footer from './components/Footer';
 import useRoute, { IRoute } from '@/routes';
 import useLocale from './utils/useLocale';
 import getUrlParams from './utils/getUrlParams';
@@ -110,7 +109,6 @@ function PageLayout() {
 
   const showNavbar = settings.navbar && urlParams.navbar !== false;
   const showMenu = settings.menu && urlParams.menu !== false;
-  const showFooter = settings.footer && urlParams.footer !== false;
 
   const flattenRoutes = useMemo(() => getFlattenRoutes(routes) || [], [routes]);
 
@@ -122,7 +120,8 @@ function PageLayout() {
         const iconDom = getIconFromKey(route.key);
         const titleDom = (
           <>
-            {iconDom} {locale[route.name] || route.name}
+            {/* {iconDom} {locale[route.name] || route.name} */}
+            {iconDom} {route.name}
           </>
         );
 
@@ -279,7 +278,6 @@ function PageLayout() {
                 </Switch>
               </Content>
             </div>
-            {showFooter && <Footer />}
           </Layout>
         </Layout>
       )}
