@@ -1,3 +1,4 @@
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Form,
   Input,
@@ -8,8 +9,8 @@ import {
 } from '@arco-design/web-react';
 import { FormInstance } from '@arco-design/web-react/es/Form';
 import { IconLock, IconUser } from '@arco-design/web-react/icon';
-import React, { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
+import { $fetch } from '@/utils';
+import Url from './url';
 import useStorage from '@/utils/useStorage';
 import useLocale from '@/utils/useLocale';
 import locale from './locale';
@@ -42,15 +43,11 @@ export default function LoginForm() {
   function login(params) {
     setErrorMessage('');
     setLoading(true);
-    axios
-      .post('/api/user/login', params)
+    $fetch(Url.login, params)
       .then((res) => {
-        const { status, msg } = res.data;
-        if (status === 'ok') {
-          afterLoginSuccess(params);
-        } else {
-          setErrorMessage(msg || t['login.form.login.errMsg']);
-        }
+        // const { token } = res;
+        console.log('res', res);
+        afterLoginSuccess(params);
       })
       .finally(() => {
         setLoading(false);
@@ -75,24 +72,19 @@ export default function LoginForm() {
 
   return (
     <div className={styles['login-form-wrapper']}>
-      <div className={styles['login-form-title']}>{t['login.form.title']}</div>
-      <div className={styles['login-form-sub-title']}>
-        {t['login.form.title']}
+      <div className={styles['login-form-title']}>
+        Integrated Business & Finance
       </div>
+      <div className={styles['login-form-sub-title']}>Login</div>
       <div className={styles['login-form-error-msg']}>{errorMessage}</div>
-      <Form
-        className={styles['login-form']}
-        layout="vertical"
-        ref={formRef}
-        initialValues={{ userName: 'admin', password: 'admin' }}
-      >
+      <Form className={styles['login-form']} layout="vertical" ref={formRef}>
         <Form.Item
           field="userName"
           rules={[{ required: true, message: t['login.form.userName.errMsg'] }]}
         >
           <Input
             prefix={<IconUser />}
-            placeholder={t['login.form.userName.placeholder']}
+            placeholder="请输入"
             onPressEnter={onSubmitClick}
           />
         </Form.Item>
@@ -102,7 +94,7 @@ export default function LoginForm() {
         >
           <Input.Password
             prefix={<IconLock />}
-            placeholder={t['login.form.password.placeholder']}
+            placeholder="请输入"
             onPressEnter={onSubmitClick}
           />
         </Form.Item>

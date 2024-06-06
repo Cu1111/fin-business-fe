@@ -48,6 +48,17 @@ module.exports = {
     if (env === 'development') {
       config.devServer.hot = false;
     }
-    return config;
+    return {
+      ...config,
+      proxy: [
+        {
+          context: (pathname, req) => {
+            return pathname.includes('/ibf/api/hr');
+          },
+          target: 'http://82.157.105.217:8080/',
+          changeOrigin: true,
+        },
+      ],
+    };
   }),
 };

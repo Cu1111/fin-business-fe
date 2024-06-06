@@ -19,7 +19,7 @@ import './mock';
 
 const { Text } = Typography;
 
-function SearchTable() {
+function PersonnelSearch() {
   const [data, setData] = useState([]);
   const [pagination, setPatination] = useState<PaginationProps>({
     sizeCanChange: true,
@@ -195,4 +195,5 @@ function SearchTable() {
   );
 }
 
-export default SearchTable;
+PersonnelSearch.display = 'PersonnelSearch';
+export default PersonnelSearch;
