@@ -1,12 +1,12 @@
 import axios from 'axios';
-
-
+import { Notification } from '@arco-design/web-react';
+import { getCookie } from './cookies';
 
 const service = axios.create({
   timeout: 5000, // 请求超时时间
   headers: {
     'Content-type': 'application/json',
-    token: 'cjx-test',
+    token: getCookie ? getCookie('ibf_ssoid') : '',
   },
 });
 
@@ -26,6 +26,14 @@ service.interceptors.response.use(
       if (code === 1) {
         console.log('data', data);
         return data;
+      } else {
+        Notification.error({
+          title: '失败',
+          content: data?.message || '请求失败，请稍后重试',
+        });
+        return Promise.reject({
+          data,
+        });
       }
     } else {
       // 其他状态码都当作错误处理
@@ -45,6 +53,7 @@ service.interceptors.response.use(
   }
 );
 
-const $fetch = (url, params) => service.post(url, params);
+const $fetch: (url: string, params: any) => any = (url, params) =>
+  service.post(url, params);
 
 export default $fetch;

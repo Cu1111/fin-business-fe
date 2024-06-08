@@ -20,7 +20,6 @@ import NProgress from 'nprogress';
 import Navbar from './components/NavBar';
 import useRoute, { IRoute } from '@/routes';
 import useLocale from './utils/useLocale';
-import getUrlParams from './utils/getUrlParams';
 import lazyload from './utils/lazyload';
 import { GlobalState } from './store';
 import styles from './style/layout.module.less';
@@ -79,7 +78,6 @@ function getFlattenRoutes(routes) {
 }
 
 function PageLayout() {
-  const urlParams = getUrlParams();
   const history = useHistory();
   const pathname = history.location.pathname;
   const currentComponent = qs.parseUrl(pathname).url.slice(1);
@@ -107,8 +105,8 @@ function PageLayout() {
   const navbarHeight = 60;
   const menuWidth = collapsed ? 48 : settings.menuWidth;
 
-  const showNavbar = settings.navbar && urlParams.navbar !== false;
-  const showMenu = settings.menu && urlParams.menu !== false;
+  const showNavbar = settings.navbar;
+  const showMenu = settings.menu;
 
   const flattenRoutes = useMemo(() => getFlattenRoutes(routes) || [], [routes]);
 

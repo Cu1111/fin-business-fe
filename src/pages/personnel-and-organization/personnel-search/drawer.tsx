@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Form,
   Input,
@@ -7,9 +7,14 @@ import {
   Drawer,
   Switch,
   Message,
+  Notification,
 } from '@arco-design/web-react';
 import dayjs from 'dayjs';
 import { SEX_OPTION } from './constants';
+import FormSelect from '@/components/formSelect';
+
+import { $fetch, DataFetch } from '@/utils';
+import Url from './url';
 
 interface DrawerFormProps {
   visible: boolean;
@@ -39,11 +44,24 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         enabledFlag: enabledFlag === true ? 'Y' : 'N',
       };
       console.log(data, params, 'data');
-      handleClose(true);
+      const fetchUrl = row ? Url.updateUsers : Url.addUser;
+      $fetch(fetchUrl, params).then((res) => {
+        Notification.success({
+          title: '成功',
+          content: res?.message || '操作成功',
+        });
+        handleClose(true);
+      });
     } catch {
       Message.error('校验失败');
     }
   };
+
+  useEffect(() => {
+    if (row) {
+      form.setFieldsValue(row);
+    }
+  }, []);
 
   return (
     <Drawer
@@ -72,7 +90,11 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
           <Input allowClear />
         </Form.Item>
         <Form.Item label="组织" field="orgId">
-          <Select options={SEX_OPTION} allowClear />
+          <FormSelect
+            showSearch
+            onFetchData={DataFetch(Url.searchOrg)}
+            allowClear
+          />
         </Form.Item>
         <Form.Item label="上级" field="supUserId">
           <Select options={SEX_OPTION} allowClear />

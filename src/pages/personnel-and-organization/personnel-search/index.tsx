@@ -10,11 +10,13 @@ import {
   Typography,
 } from '@arco-design/web-react';
 import { IconDownload, IconPlus } from '@arco-design/web-react/icon';
+import { $fetch } from '@/utils';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import SearchForm from './form';
 import DrawerForm from './drawer';
 import styles from './style/index.module.less';
+import Url from './url';
 import './mock';
 
 const { Text } = Typography;
@@ -36,6 +38,8 @@ function PersonnelSearch() {
 
   const handleEdit = (row) => {
     console.log(row, 'row');
+    rowRef.current = row;
+    setVisible(true);
   };
 
   const handleNoSupport = () => {
@@ -114,22 +118,24 @@ function PersonnelSearch() {
   function fetchData() {
     const { current, pageSize } = pagination;
     setLoading(true);
-    axios
-      .get('/api/list', {
-        params: {
-          page: current,
-          pageSize,
-          ...formParams,
-        },
-      })
+    $fetch(Url.getUsers, {
+      page: {
+        pageNo: current,
+        pageSize,
+      },
+      ...formParams,
+    })
       .then((res) => {
-        setData(res.data.list);
+        const { page, pageList } = res;
         setPatination({
           ...pagination,
-          current,
-          pageSize,
-          total: res.data.total,
+          current: page?.pageNo,
+          pageSize: page?.pageSize,
+          total: page?.totalCount,
         });
+        setData(pageList);
+      })
+      .finally(() => {
         setLoading(false);
       });
   }

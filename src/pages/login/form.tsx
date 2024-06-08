@@ -15,6 +15,7 @@ import useStorage from '@/utils/useStorage';
 import useLocale from '@/utils/useLocale';
 import locale from './locale';
 import styles from './style/index.module.less';
+import { setCookie } from '@/utils';
 
 export default function LoginForm() {
   const formRef = useRef<FormInstance>();
@@ -45,8 +46,9 @@ export default function LoginForm() {
     setLoading(true);
     $fetch(Url.login, params)
       .then((res) => {
-        // const { token } = res;
+        const { token } = res;
         console.log('res', res);
+        setCookie('ibf_ssoid', token, 2);
         afterLoginSuccess(params);
       })
       .finally(() => {

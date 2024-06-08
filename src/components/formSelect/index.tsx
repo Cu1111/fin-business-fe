@@ -2,8 +2,13 @@ import React, { useState, useRef } from 'react';
 import { Select, Spin } from '@arco-design/web-react';
 import debounce from 'lodash/debounce';
 
-const FormSelect = (props) => {
-  const { value, onChange, onFetchData, ...others } = props;
+interface FormSelectProps extends React.ComponentProps<typeof Select> {
+  onFetchData?: (filter?) => any;
+  initSearch?: boolean;
+}
+
+const FormSelect = (props: FormSelectProps) => {
+  const { value, onChange, onFetchData, initSearch = true, ...others } = props;
   const [options, setOptions] = useState([]);
   const [fetching, setFetching] = useState(false);
 
@@ -39,8 +44,25 @@ const FormSelect = (props) => {
           >
             <Spin style={{ margin: 12 }} />
           </div>
-        ) : null
+        ) : (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              margin: '10px auto',
+            }}
+          >
+            暂无数据
+          </div>
+        )
       }
+      onClick={() => {
+        if (initSearch) {
+          debouncedFetchData('');
+        }
+      }}
+      // onFocus={debouncedFetchData}
       onSearch={debouncedFetchData}
     />
   );

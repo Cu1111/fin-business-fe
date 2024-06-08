@@ -3,7 +3,7 @@ import prefix from '@/utils/urlPrefix';
 const Url = {
   addUser: `${prefix}/addUsers`,
   searchOrg: `${prefix}/searchOrg`,
-  searchUsers: `${prefix}/searchUsers`,
+  getUsers: `${prefix}/getUsers`,
   updateUsers: `${prefix}/updateUsers`,
 };
 
