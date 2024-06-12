@@ -26,6 +26,20 @@ export const routes: IRoute[] = [
       },
     ],
   },
+  {
+    name: '数据字典',
+    key: 'data-dictionary',
+    children: [
+      {
+        name: '设置类型',
+        key: 'data-dictionary/set-type',
+      },
+      {
+        name: '设置选项',
+        key: 'data-dictionary/set-data',
+      },
+    ],
+  },
 ];
 
 export const getName = (path: string, routes) => {

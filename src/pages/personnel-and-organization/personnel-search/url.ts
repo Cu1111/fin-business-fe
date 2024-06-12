@@ -1,10 +1,10 @@
 import prefix from '@/utils/urlPrefix';
 
 const Url = {
-  addUser: `${prefix}/addUsers`,
-  searchOrg: `${prefix}/searchOrg`,
-  getUsers: `${prefix}/getUsers`,
-  updateUsers: `${prefix}/updateUsers`,
+  addUser: `${prefix}/hr/addUsers`,
+  searchOrg: `${prefix}/hr/searchOrg`,
+  getUsers: `${prefix}/hr/getUsers`,
+  updateUsers: `${prefix}/hr/updateUsers`,
 };
 
 export default Url;

@@ -11,14 +11,18 @@ import {
 import { GlobalContext } from '@/context';
 import locale from './locale';
 import useLocale from '@/utils/useLocale';
-import { IconRefresh, IconSearch } from '@arco-design/web-react/icon';
-import { ContentType, FilterType, Status } from './constants';
+import { IconSearch } from '@arco-design/web-react/icon';
+import { ENABLE_FLAG } from './constants';
+import FormSelect from '@/components/formSelect';
+
+import { DataFetch } from '@/utils';
+import Url from './url';
+
 import styles from './style/index.module.less';
 
 const { Row, Col } = Grid;
 const { useForm } = Form;
 const RangePicker: any = DatePicker.RangePicker;
-
 
 function SearchForm(props: {
   onSearch: (values: Record<string, any>) => void;
@@ -51,73 +55,24 @@ function SearchForm(props: {
       >
         <Row gutter={24}>
           <Col span={colSpan}>
-            <Form.Item label={t['searchTable.columns.id']} field="id">
-              <Input placeholder={t['searchForm.id.placeholder']} allowClear />
-            </Form.Item>
-          </Col>
-          <Col span={colSpan}>
-            <Form.Item label={t['searchTable.columns.name']} field="name">
-              <Input
-                allowClear
-                placeholder={t['searchForm.name.placeholder']}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={colSpan}>
-            <Form.Item
-              label={t['searchTable.columns.contentType']}
-              field="contentType"
-            >
-              <Select
-                placeholder={t['searchForm.all.placeholder']}
-                options={ContentType.map((item, index) => ({
-                  label: item,
-                  value: index,
-                }))}
-                mode="multiple"
+            <Form.Item label="组织分类" field="id">
+              <FormSelect
+                showSearch
+                onFetchData={DataFetch(Url.searchDictValues, {
+                  dictType: 'ORG_TYPE',
+                })}
                 allowClear
               />
             </Form.Item>
           </Col>
           <Col span={colSpan}>
-            <Form.Item
-              label={t['searchTable.columns.filterType']}
-              field="filterType"
-            >
-              <Select
-                placeholder={t['searchForm.all.placeholder']}
-                options={FilterType.map((item, index) => ({
-                  label: item,
-                  value: index,
-                }))}
-                mode="multiple"
-                allowClear
-              />
+            <Form.Item label="组织名称" field="name">
+              <Input allowClear placeholder="请输入" />
             </Form.Item>
           </Col>
           <Col span={colSpan}>
-            <Form.Item
-              label={t['searchTable.columns.createdTime']}
-              field="createdTime"
-            >
-              <RangePicker
-                allowClear
-                style={{ width: '100%' }}
-                disabledDate={(date) => dayjs(date).isAfter(dayjs())}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={colSpan}>
-            <Form.Item label={t['searchTable.columns.status']} field="status">
-              <Select
-                placeholder={t['searchForm.all.placeholder']}
-                options={Status.map((item, index) => ({
-                  label: item,
-                  value: index,
-                }))}
-                mode="multiple"
-                allowClear
-              />
+            <Form.Item label="是否启用" field="contentType">
+              <Select placeholder="请选择" options={ENABLE_FLAG} allowClear />
             </Form.Item>
           </Col>
         </Row>
@@ -126,9 +81,9 @@ function SearchForm(props: {
         <Button type="primary" icon={<IconSearch />} onClick={handleSubmit}>
           {t['searchTable.form.search']}
         </Button>
-        <Button icon={<IconRefresh />} onClick={handleReset}>
+        {/* <Button icon={<IconRefresh />} onClick={handleReset}>
           {t['searchTable.form.reset']}
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

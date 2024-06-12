@@ -1,3 +1,3 @@
-const prefix = '/ibf/api/hr';
+const prefix = '/ibf/api';
 
 export default prefix;

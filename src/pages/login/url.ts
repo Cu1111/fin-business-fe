@@ -1,7 +1,7 @@
 import prefix from '@/utils/urlPrefix';
 
 const Url = {
-  login: `${prefix}/login`,
+  login: `${prefix}/hr/login`,
 };
 
 export default Url;

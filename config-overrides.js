@@ -53,7 +53,7 @@ module.exports = {
       proxy: [
         {
           context: (pathname, req) => {
-            return pathname.includes('/ibf/api/hr');
+            return pathname.includes('/ibf/api/');
           },
           target: 'http://82.157.105.217:8080/',
           changeOrigin: true,

@@ -10,11 +10,13 @@ import {
   Typography,
 } from '@arco-design/web-react';
 import { IconDownload, IconPlus } from '@arco-design/web-react/icon';
-import axios from 'axios';
+import { $fetch } from '@/utils';
 import dayjs from 'dayjs';
 import SearchForm from './form';
 import DrawerForm from './drawer';
 import styles from './style/index.module.less';
+import Url from './url';
+
 import './mock';
 
 const { Text } = Typography;
@@ -50,30 +52,30 @@ function OrganizationSearch() {
     () => [
       {
         title: '组织分类',
-        dataIndex: 'userName',
+        dataIndex: 'orgType',
         width: 200,
       },
       {
         title: '组织编码',
-        dataIndex: 'empNumber',
+        dataIndex: 'orgCode',
         render: (value) => <Text copyable>{value}</Text>,
       },
       {
         title: '组织名称',
-        dataIndex: 'gender',
+        dataIndex: 'orgName',
         render: (value) => (value === 'M' ? '男' : '女'),
       },
       {
         title: '上级组织编码',
-        dataIndex: 'email',
+        dataIndex: 'superOrgCode',
       },
       {
         title: '上级组织名称',
-        dataIndex: 'orgId',
+        dataIndex: 'superOrgName',
       },
       {
         title: '成本中心',
-        dataIndex: 'supUserName',
+        dataIndex: 'costCenter',
       },
       {
         title: '是否启用',
@@ -110,22 +112,24 @@ function OrganizationSearch() {
   function fetchData() {
     const { current, pageSize } = pagination;
     setLoading(true);
-    axios
-      .get('/api/list', {
-        params: {
-          page: current,
-          pageSize,
-          ...formParams,
-        },
-      })
+    $fetch(Url.getOrg, {
+      page: {
+        pageNo: current,
+        pageSize,
+      },
+      ...formParams,
+    })
       .then((res) => {
-        setData(res.data.list);
+        const { page, pageList } = res;
         setPatination({
           ...pagination,
-          current,
-          pageSize,
-          total: res.data.total,
+          current: page?.pageNo,
+          pageSize: page?.pageSize,
+          total: page?.totalCount,
         });
+        setData(pageList);
+      })
+      .finally(() => {
         setLoading(false);
       });
   }
