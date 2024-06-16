@@ -40,6 +40,10 @@ export const routes: IRoute[] = [
       },
     ],
   },
+  {
+    name: '会计科目结构',
+    key: 'acc-structure',
+  },
 ];
 
 export const getName = (path: string, routes) => {

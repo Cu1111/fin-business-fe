@@ -35,15 +35,14 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
     try {
       await form.validate();
       const data = form.getFields();
-      const { startTime, endTime, enabledFlag } = data;
+      const { enabledFlag } = data;
+      console.log(enabledFlag, 'enabledFlag');
       const params = {
         ...data,
-        startTime: startTime && dayjs(startTime).valueOf(),
-        endTime: endTime && dayjs(endTime).valueOf(),
         enabledFlag: enabledFlag === true ? 'Y' : 'N',
       };
       console.log(data, params, 'data');
-      const fetchUrl = row ? Url.updateOrg : Url.addOrg;
+      const fetchUrl = row ? Url.updateAccStructure : Url.addAccStructure;
       $fetch(fetchUrl, params).then((res) => {
         Notification.success({
           title: '成功',
@@ -58,13 +57,18 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
 
   useEffect(() => {
     if (row) {
-      form.setFieldsValue(row);
+      const { enabledFlag, ...other } = row;
+      console.log(row, 'row');
+      const data = { ...other, enabledFlag: enabledFlag === 'Y' };
+      console.log(data, 'data');
+
+      form.setFieldsValue({ ...other, enabledFlag: enabledFlag === 'Y' });
     }
   }, []);
 
   return (
     <Drawer
-      width={500}
+      width={400}
       title={<span>{row ? '编辑' : '新增'}</span>}
       visible={visible}
       confirmLoading={confirmLoading}
@@ -78,45 +82,22 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
       <Form
         form={form}
         labelAlign="left"
-        labelCol={{ span: 6 }}
-        wrapperCol={{ span: 18 }}
+        labelCol={{ span: 7 }}
+        wrapperCol={{ span: 17 }}
       >
         <Form.Item
-          label="组织类型"
-          field="orgType"
+          label="类型Code"
+          field="dictType"
           rules={[{ required: true }]}
         >
-          <FormSelect
-            showSearch
-            onFetchData={DataFetch(Url.searchDictValues, {
-              dictType: 'ORG_TYPE',
-            })}
-            allowClear
-          />
+          <Input disabled={!!row} allowClear />
         </Form.Item>
         <Form.Item
-          label="组织编码"
-          field="orgCode"
+          label="类型描述"
+          field="dictDesc"
           rules={[{ required: true }]}
         >
           <Input allowClear />
-        </Form.Item>
-        <Form.Item
-          label="组织名称"
-          field="orgName"
-          rules={[{ required: true }]}
-        >
-          <Input allowClear />
-        </Form.Item>
-        <Form.Item label="上级组织编码" field="superOrgCode">
-          <FormSelect
-            showSearch
-            onFetchData={DataFetch(Url.searchOrg)}
-            allowClear
-          />
-        </Form.Item>
-        <Form.Item label="上级组织名称" field="superOrgName">
-          <span />
         </Form.Item>
         <Form.Item
           label="是否启用"
@@ -124,15 +105,6 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
           triggerPropName="checked"
         >
           <Switch />
-        </Form.Item>
-        <Form.Item label="成本中心" field="officeLocation">
-          <Input allowClear />
-        </Form.Item>
-        <Form.Item label="开始时间" field="startTime">
-          <DatePicker />
-        </Form.Item>
-        <Form.Item label="结束时间" field="endTime">
-          <DatePicker />
         </Form.Item>
       </Form>
     </Drawer>

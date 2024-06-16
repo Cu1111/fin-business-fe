@@ -45,13 +45,18 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
       };
       console.log(data, params, 'data');
       const fetchUrl = row ? Url.updateUsers : Url.addUser;
-      $fetch(fetchUrl, params).then((res) => {
-        Notification.success({
-          title: '成功',
-          content: res?.message || '操作成功',
+      setConfirmLoading(true);
+      $fetch(fetchUrl, params)
+        .then((res) => {
+          Notification.success({
+            title: '成功',
+            content: res?.message || '操作成功',
+          });
+          handleClose(true);
+        })
+        .finally(() => {
+          setConfirmLoading(false);
         });
-        handleClose(true);
-      });
     } catch {
       Message.error('校验失败');
     }
@@ -99,7 +104,11 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         <Form.Item label="上级" field="supUserId">
           <Select options={SEX_OPTION} allowClear />
         </Form.Item>
-        <Form.Item label="是否启用" field="enabledFlag">
+        <Form.Item
+          label="是否启用"
+          field="enabledFlag"
+          triggerPropName="checked"
+        >
           <Switch />
         </Form.Item>
         <Form.Item label="开始时间" field="startTime">
