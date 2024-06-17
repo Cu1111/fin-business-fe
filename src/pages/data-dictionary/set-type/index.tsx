@@ -31,12 +31,13 @@ function PersonnelSearch() {
   const [loading, setLoading] = useState(true);
   const [formParams, setFormParams] = useState({});
   const [visible, setVisible] = useState<boolean>(false);
+  const [rowData, setRowData] = useState(null);
 
   const rowRef = useRef(null);
 
   const handleEdit = (row) => {
     console.log(row, 'row');
-    rowRef.current = row;
+    setRowData(row);
     setVisible(true);
   };
 
@@ -107,8 +108,7 @@ function PersonnelSearch() {
   }
 
   const handleAdd = () => {
-    console.log('add');
-    rowRef.current = null;
+    setRowData(null);
     setVisible(true);
   };
 
@@ -158,11 +158,9 @@ function PersonnelSearch() {
         columns={columns}
         data={data}
       />
-      <DrawerForm
-        visible={visible}
-        row={rowRef.current}
-        handleClose={handleClose}
-      />
+      {visible && (
+        <DrawerForm visible row={rowData} handleClose={handleClose} />
+      )}
     </Card>
   );
 }

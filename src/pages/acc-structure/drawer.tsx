@@ -35,11 +35,8 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
     try {
       await form.validate();
       const data = form.getFields();
-      const { enabledFlag } = data;
-      console.log(enabledFlag, 'enabledFlag');
       const params = {
         ...data,
-        enabledFlag: enabledFlag === true ? 'Y' : 'N',
       };
       console.log(data, params, 'data');
       const fetchUrl = row ? Url.updateAccStructure : Url.addAccStructure;
@@ -68,7 +65,7 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
 
   return (
     <Drawer
-      width={400}
+      width={500}
       title={<span>{row ? '编辑' : '新增'}</span>}
       visible={visible}
       confirmLoading={confirmLoading}
@@ -86,25 +83,36 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         wrapperCol={{ span: 17 }}
       >
         <Form.Item
-          label="类型Code"
+          label="会计科目结构"
           field="dictType"
           rules={[{ required: true }]}
         >
-          <Input disabled={!!row} allowClear />
+          <FormSelect
+            showSearch
+            onFetchData={DataFetch(Url.searchDictValues, {
+              dictType: 'ACC_STRUCTURE',
+            })}
+            renderLabel={(v) => `${v.value}/${v.label}`}
+            allowClear
+          />
         </Form.Item>
-        <Form.Item
-          label="类型描述"
-          field="dictDesc"
-          rules={[{ required: true }]}
-        >
+        <Form.Item label="段值" field="segment" rules={[{ required: true }]}>
+          <Input allowClear />
+        </Form.Item>
+        <Form.Item label="段值描述" field="segmentDesc">
           <Input allowClear />
         </Form.Item>
         <Form.Item
-          label="是否启用"
-          field="enabledFlag"
-          triggerPropName="checked"
+          label="数据字典类型"
+          field="dictType"
+          rules={[{ required: true }]}
         >
-          <Switch />
+          <FormSelect
+            showSearch
+            onFetchData={DataFetch(Url.searchDictType)}
+            renderLabel={(v) => `${v.value}/${v.label}`}
+            allowClear
+          />
         </Form.Item>
       </Form>
     </Drawer>

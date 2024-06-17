@@ -163,11 +163,9 @@ function PersonnelSearch() {
         columns={columns}
         data={data}
       />
-      <DrawerForm
-        visible={visible}
-        row={rowRef.current}
-        handleClose={handleClose}
-      />
+      {visible && (
+        <DrawerForm visible row={rowRef.current} handleClose={handleClose} />
+      )}
     </Card>
   );
 }

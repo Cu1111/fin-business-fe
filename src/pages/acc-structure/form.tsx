@@ -41,6 +41,7 @@ function SearchForm(props: {
                 onFetchData={DataFetch(Url.searchDictValues, {
                   dictType: 'ACC_STRUCTURE',
                 })}
+                renderLabel={(v) => `${v.value}/${v.label}`}
                 allowClear
               />
             </Form.Item>

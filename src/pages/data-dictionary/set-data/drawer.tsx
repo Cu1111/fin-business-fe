@@ -35,10 +35,11 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
     try {
       await form.validate();
       const data = form.getFields();
-      const { enabledFlag } = data;
-      console.log(enabledFlag, 'enabledFlag');
+      const { startTime, endTime, enabledFlag } = data;
       const params = {
         ...data,
+        startTime: startTime && dayjs(startTime).valueOf(),
+        endTime: endTime && dayjs(endTime).valueOf(),
         enabledFlag: enabledFlag === true ? 'Y' : 'N',
       };
       console.log(data, params, 'data');
@@ -61,7 +62,6 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
       console.log(row, 'row');
       const data = { ...other, enabledFlag: enabledFlag === 'Y' };
       console.log(data, 'data');
-
       form.setFieldsValue({ ...other, enabledFlag: enabledFlag === 'Y' });
     }
   }, []);
@@ -85,16 +85,24 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         labelCol={{ span: 7 }}
         wrapperCol={{ span: 17 }}
       >
-        <Form.Item
-          label="类型Code"
-          field="dictType"
-          rules={[{ required: true }]}
-        >
-          <Input disabled={!!row} allowClear />
+        <Form.Item label="类型" field="dictType" rules={[{ required: true }]}>
+          <FormSelect
+            showSearch
+            onFetchData={DataFetch(Url.searchDictType)}
+            renderLabel={(v) => `${v.value}/${v.label}`}
+            allowClear
+          />
         </Form.Item>
         <Form.Item
-          label="类型描述"
-          field="dictDesc"
+          label="选项Code"
+          field="dictCode"
+          rules={[{ required: true }]}
+        >
+          <Input allowClear />
+        </Form.Item>
+        <Form.Item
+          label="选项描述"
+          field="dictName"
           rules={[{ required: true }]}
         >
           <Input allowClear />
@@ -105,6 +113,12 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
           triggerPropName="checked"
         >
           <Switch />
+        </Form.Item>
+        <Form.Item label="开始时间" field="startTime">
+          <DatePicker />
+        </Form.Item>
+        <Form.Item label="结束时间" field="endTime">
+          <DatePicker />
         </Form.Item>
       </Form>
     </Drawer>

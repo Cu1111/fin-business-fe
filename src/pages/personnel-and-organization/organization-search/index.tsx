@@ -51,7 +51,7 @@ function OrganizationSearch() {
   const columns = useMemo(
     () => [
       {
-        title: '组织分类',
+        title: '组织类型',
         dataIndex: 'orgType',
         width: 200,
       },
@@ -186,11 +186,9 @@ function OrganizationSearch() {
         columns={columns}
         data={data}
       />
-      <DrawerForm
-        visible={visible}
-        row={rowRef.current}
-        handleClose={handleClose}
-      />
+      {visible && (
+        <DrawerForm visible row={rowRef.current} handleClose={handleClose} />
+      )}
     </Card>
   );
 }

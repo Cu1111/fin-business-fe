@@ -4,8 +4,12 @@ import { GlobalContext } from '@/context';
 import locale from './locale';
 import useLocale from '@/utils/useLocale';
 import { IconRefresh, IconSearch } from '@arco-design/web-react/icon';
+import FormSelect from '@/components/formSelect';
+import { DataFetch } from '@/utils';
 import { SEX_OPTION } from './constants';
 import styles from './style/index.module.less';
+
+import Url from './url';
 
 const { Row, Col } = Grid;
 const { useForm } = Form;
@@ -76,10 +80,9 @@ function SearchForm(props: {
           </Col>
           <Col span={colSpan}>
             <Form.Item label="组织" field="orgId">
-              <Select
-                placeholder={t['searchForm.common.select']}
-                options={SEX_OPTION}
-                // mode="multiple"
+              <FormSelect
+                showSearch
+                onFetchData={DataFetch(Url.searchOrg)}
                 allowClear
               />
             </Form.Item>

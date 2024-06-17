@@ -4,7 +4,7 @@ import debounce from 'lodash/debounce';
 
 interface FormSelectProps extends React.ComponentProps<typeof Select> {
   onFetchData?: (filter?) => any;
-  renderOptions?: (data?) => any;
+  renderLabel?: (data?) => any;
   initSearch?: boolean;
   keyValue?: string;
   labelValue?: string;
@@ -16,13 +16,13 @@ const FormSelect = (props: FormSelectProps) => {
     onChange,
     onFetchData,
     initSearch = true,
-    renderOptions,
+    renderLabel,
     keyValue = 'value',
     labelValue = 'label',
     ...others
   } = props;
   const [options, setOptions] = useState([]);
-  const [fetching, setFetching] = useState(false);
+  const [fetching, setFetching] = useState(true);
 
   const refFetchId = useRef<number>();
 
@@ -34,12 +34,14 @@ const FormSelect = (props: FormSelectProps) => {
     onFetchData(filter).then((data) => {
       if (refFetchId.current === fetchId) {
         setFetching(false);
-        if (renderOptions) {
-          const options = data.map(() => {
-            return;
-          });
-        }
-        setOptions(data);
+        const options = data.map((v) => {
+          return {
+            value: v?.[keyValue],
+            label: renderLabel ? renderLabel(v) : v?.[labelValue],
+          };
+        });
+
+        setOptions(options);
       }
     });
   }, 200);
@@ -79,6 +81,9 @@ const FormSelect = (props: FormSelectProps) => {
           debouncedFetchData('');
         }
       }}
+      // onBlur={() => {
+      //   setOptions(null);
+      // }}
       onSearch={debouncedFetchData}
     />
   );

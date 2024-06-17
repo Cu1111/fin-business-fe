@@ -11,7 +11,6 @@ import {
 } from '@arco-design/web-react';
 import { IconDownload, IconPlus } from '@arco-design/web-react/icon';
 import { $fetch } from '@/utils';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import SearchForm from './form';
 import DrawerForm from './drawer';
@@ -192,11 +191,9 @@ function PersonnelSearch() {
         columns={columns}
         data={data}
       />
-      <DrawerForm
-        visible={visible}
-        row={rowRef.current}
-        handleClose={handleClose}
-      />
+      {visible && (
+        <DrawerForm visible row={rowRef.current} handleClose={handleClose} />
+      )}
     </Card>
   );
 }

@@ -5,6 +5,7 @@ const Url = {
   addAccStructure: `${prefix}/base/addAccStructure`,
   updateAccStructure: `${prefix}/base/updateAccStructure`,
   searchDictValues: `${prefix}/base/searchDictValues`,
+  searchDictType: `${prefix}/base/searchDictType`,
 };
 
 export default Url;

@@ -64,7 +64,8 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
 
   useEffect(() => {
     if (row) {
-      form.setFieldsValue(row);
+      const { enabledFlag, ...other } = row;
+      form.setFieldsValue({ ...other, enabledFlag: enabledFlag === 'Y' });
     }
   }, []);
 

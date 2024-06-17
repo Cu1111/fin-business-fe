@@ -56,15 +56,14 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
   };
 
   useEffect(() => {
+    console.log('rowwwww', row);
     if (row) {
       const { enabledFlag, ...other } = row;
-      console.log(row, 'row');
-      const data = { ...other, enabledFlag: enabledFlag === 'Y' };
-      console.log(data, 'data');
-
       form.setFieldsValue({ ...other, enabledFlag: enabledFlag === 'Y' });
+    } else {
+      form.setFieldsValue(null);
     }
-  }, []);
+  }, [form, row]);
 
   return (
     <Drawer
@@ -77,7 +76,7 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         handleClose();
       }}
       maskClosable={false}
-      unmountOnExit={true}
+      unmountOnExit
     >
       <Form
         form={form}

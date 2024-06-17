@@ -45,6 +45,7 @@ function SearchForm(props: {
               <FormSelect
                 showSearch
                 onFetchData={DataFetch(Url.searchDictType)}
+                renderLabel={(v) => `${v.value}/${v.label}`}
                 allowClear
               />
             </Form.Item>

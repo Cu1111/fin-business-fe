@@ -69,6 +69,11 @@ function PersonnelSearch() {
         dataIndex: 'dictName',
       },
       {
+        title: '是否启用',
+        dataIndex: 'enabledFlag',
+        render: (v) => <Switch checked={v === 'Y'} />,
+      },
+      {
         title: '开始时间',
         dataIndex: 'startTime',
         render: (v) => (v ? dayjs(v).format('YYYY-MM-DD') : ''),
@@ -77,11 +82,6 @@ function PersonnelSearch() {
         title: '结束时间',
         dataIndex: 'endTime',
         render: (v) => (v ? dayjs(v).format('YYYY-MM-DD') : ''),
-      },
-      {
-        title: '是否启用',
-        dataIndex: 'enabledFlag',
-        render: (v) => <Switch checked={v === 'Y'} />,
       },
       {
         title: '操作',
@@ -177,11 +177,9 @@ function PersonnelSearch() {
         columns={columns}
         data={data}
       />
-      <DrawerForm
-        visible={visible}
-        row={rowRef.current}
-        handleClose={handleClose}
-      />
+      {visible && (
+        <DrawerForm visible row={rowRef.current} handleClose={handleClose} />
+      )}
     </Card>
   );
 }
