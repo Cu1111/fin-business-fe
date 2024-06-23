@@ -4,6 +4,7 @@ import {
   Card,
   Switch,
   PaginationProps,
+  TableColumnProps,
   Button,
   Notification,
   Space,
@@ -49,7 +50,7 @@ function PersonnelSearch() {
     });
   };
 
-  const columns = useMemo(
+  const columns = useMemo<Array<TableColumnProps>>(
     () => [
       {
         title: '姓名',
@@ -60,46 +61,57 @@ function PersonnelSearch() {
         title: '工号',
         dataIndex: 'empNumber',
         render: (value) => <Text copyable>{value}</Text>,
+        width: 200,
       },
       {
         title: '性别',
         dataIndex: 'gender',
         render: (value) => (value === 'M' ? '男' : '女'),
+        width: 80,
       },
       {
         title: '邮箱',
         dataIndex: 'email',
+        width: 160,
       },
       {
         title: '组织',
         dataIndex: 'orgId',
+        width: 200,
       },
       {
         title: '上级',
         dataIndex: 'supUserName',
+        width: 200,
       },
       {
         title: '是否启用',
         dataIndex: 'enabledFlag',
         render: (v) => <Switch checked={v === 'Y'} />,
+        width: 100,
       },
       {
         title: '开始时间',
         dataIndex: 'startTime',
         render: (v) => (v ? dayjs(v).format('YYYY-MM-DD') : ''),
+        width: 130,
       },
       {
         title: '结束时间',
         dataIndex: 'endTime',
         render: (v) => (v ? dayjs(v).format('YYYY-MM-DD') : ''),
+        width: 130,
       },
       {
         title: '办公地点',
         dataIndex: 'officeLocation',
+        width: 200,
       },
       {
         title: '操作',
         dataIndex: 'operation',
+        width: 100,
+        fixed: 'right',
         render: (_, row) => (
           <Button type="primary" size="small" onClick={() => handleEdit(row)}>
             编辑
@@ -112,7 +124,7 @@ function PersonnelSearch() {
 
   useEffect(() => {
     fetchData();
-  }, [pagination.current, pagination.pageSize, JSON.stringify(formParams)]);
+  }, [pagination.current, pagination.pageSize, formParams]);
 
   function fetchData() {
     const { current, pageSize } = pagination;
@@ -189,6 +201,7 @@ function PersonnelSearch() {
         onChange={onChangeTable}
         pagination={pagination}
         columns={columns}
+        scroll={{ x: true, y: true }}
         data={data}
       />
       {visible && (

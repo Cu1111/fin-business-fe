@@ -44,6 +44,10 @@ export const routes: IRoute[] = [
     name: '会计科目结构',
     key: 'acc-structure',
   },
+  {
+    name: '系统来源',
+    key: 'system-source',
+  },
 ];
 
 export const getName = (path: string, routes) => {

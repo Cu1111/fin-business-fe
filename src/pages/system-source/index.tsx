@@ -3,13 +3,16 @@ import {
   Table,
   Card,
   PaginationProps,
+  TableColumnProps,
   Button,
   Notification,
   Space,
   Typography,
+  Switch,
 } from '@arco-design/web-react';
 import { IconDownload, IconPlus } from '@arco-design/web-react/icon';
 import { $fetch } from '@/utils';
+import dayjs from 'dayjs';
 import SearchForm from './form';
 import DrawerForm from './drawer';
 import styles from './style/index.module.less';
@@ -28,7 +31,9 @@ function PersonnelSearch() {
   });
   const [loading, setLoading] = useState(true);
   const [formParams, setFormParams] = useState({});
-  const [visible, setVisible] = useState<boolean>(false);
+  const [visible, setVisible] = useState<boolean>(false); // 新增修改弹窗的显示
+  const [accountShow, setAccountShow] = useState<boolean>(false); // 核算主体弹窗的显示
+  const [mappingShow, setMappingShow] = useState<boolean>(false); // 核算主体弹窗的显示
 
   const rowRef = useRef(null);
 
@@ -36,6 +41,16 @@ function PersonnelSearch() {
     console.log(row, 'row');
     rowRef.current = row;
     setVisible(true);
+  };
+
+  const showAccount = (row) => {
+    rowRef.current = row;
+    setAccountShow(true);
+  };
+
+  const showMapping = (row) => {
+    rowRef.current = row;
+    setMappingShow(true);
   };
 
   const handleNoSupport = () => {
@@ -46,36 +61,82 @@ function PersonnelSearch() {
     });
   };
 
-  const columns = useMemo(
+  const columns = useMemo<Array<TableColumnProps>>(
     () => [
       {
-        title: '会计科目结构',
+        title: '业务系统代码',
         dataIndex: 'accStructureCode',
-        width: 200,
+        fixed: 'left',
+        width: 120,
       },
       {
-        title: '段值',
+        title: '业务系统名称',
         dataIndex: 'segment',
+        width: 120,
         render: (value) => <Text copyable>{value}</Text>,
       },
       {
-        title: '段值描述',
+        title: '日记账来源代码',
         dataIndex: 'segmentDesc',
-        width: 200,
+        width: 160,
       },
       {
-        title: '数据字典',
+        title: '日记账来源名称',
         dataIndex: 'dictType',
+        width: 200,
         render: (_, row) =>
           row?.dictType && row?.dictDesc && `${row?.dictType}/${row?.dictDesc}`,
       },
       {
+        title: '接口表名称',
+        dataIndex: 'dictType',
+        width: 140,
+        render: (_, row) =>
+          row?.dictType && row?.dictDesc && `${row?.dictType}/${row?.dictDesc}`,
+      },
+      {
+        title: '是否启用',
+        dataIndex: 'enabledFlag',
+        width: 100,
+        render: (v) => <Switch checked={v === 'Y'} />,
+      },
+      {
+        title: '开始时间',
+        dataIndex: 'startTime',
+        width: 140,
+        render: (v) => (v ? dayjs(v).format('YYYY-MM-DD') : ''),
+      },
+      {
+        title: '结束时间',
+        dataIndex: 'endTime',
+        width: 140,
+        render: (v) => (v ? dayjs(v).format('YYYY-MM-DD') : ''),
+      },
+      {
         title: '操作',
         dataIndex: 'operation',
+        fixed: 'right',
+        width: 280,
         render: (_, row) => (
-          <Button type="primary" size="small" onClick={() => handleEdit(row)}>
-            编辑
-          </Button>
+          <>
+            <Button
+              type="primary"
+              size="small"
+              onClick={() => showAccount(row)}
+            >
+              核算主体
+            </Button>
+            <Button
+              type="primary"
+              size="small"
+              onClick={() => showMapping(row)}
+            >
+              接口映射
+            </Button>
+            <Button type="primary" size="small" onClick={() => handleEdit(row)}>
+              编辑
+            </Button>
+          </>
         ),
       },
     ],
@@ -84,12 +145,12 @@ function PersonnelSearch() {
 
   useEffect(() => {
     fetchData();
-  }, [pagination.current, pagination.pageSize, JSON.stringify(formParams)]);
+  }, [pagination.current, pagination.pageSize, formParams]);
 
   function fetchData() {
     const { current, pageSize } = pagination;
     setLoading(true);
-    $fetch(Url.getAccStructure, {
+    $fetch(Url.getSystemSource, {
       page: {
         pageNo: current,
         pageSize,
@@ -161,6 +222,7 @@ function PersonnelSearch() {
         onChange={onChangeTable}
         pagination={pagination}
         columns={columns}
+        scroll={{ x: true, y: true }}
         data={data}
       />
       {visible && (
