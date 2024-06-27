@@ -15,8 +15,6 @@ import { $fetch } from '@/utils';
 import dayjs from 'dayjs';
 import SearchForm from './form';
 import DrawerForm from './drawer';
-import AccountDrawer from './accountDrawer';
-
 import styles from './style/index.module.less';
 import Url from './url';
 
@@ -34,8 +32,6 @@ function PersonnelSearch() {
   const [loading, setLoading] = useState(true);
   const [formParams, setFormParams] = useState({});
   const [visible, setVisible] = useState<boolean>(false); // 新增修改弹窗的显示
-  const [accountShow, setAccountShow] = useState<boolean>(false); // 核算主体弹窗的显示
-  const [mappingShow, setMappingShow] = useState<boolean>(false); // 核算主体弹窗的显示
 
   const rowRef = useRef(null);
 
@@ -43,16 +39,6 @@ function PersonnelSearch() {
     console.log(row, 'row');
     rowRef.current = row;
     setVisible(true);
-  };
-
-  const showAccount = (row) => {
-    rowRef.current = row;
-    setAccountShow(true);
-  };
-
-  const showMapping = (row) => {
-    rowRef.current = row;
-    setMappingShow(true);
   };
 
   const handleNoSupport = () => {
@@ -66,76 +52,28 @@ function PersonnelSearch() {
   const columns = useMemo<Array<TableColumnProps>>(
     () => [
       {
-        title: '业务系统代码',
-        dataIndex: 'systemSourceCode',
-        fixed: 'left',
-        width: 120,
+        title: '业务类型代码',
+        dataIndex: 'businessTypeCode',
       },
       {
-        title: '业务系统名称',
-        dataIndex: '',
-        width: 120,
+        title: '业务类型名称',
+        dataIndex: 'businessTypeName',
       },
       {
-        title: '日记账来源代码',
-        dataIndex: 'jeSource',
-        width: 160,
+        title: '日记账类别代码',
+        dataIndex: 'jeCategory',
       },
       {
-        title: '日记账来源名称',
-        dataIndex: '',
-        width: 200,
-      },
-      {
-        title: '接口表名称',
-        dataIndex: 'tableName',
-        width: 160,
-      },
-      {
-        title: '是否启用',
-        dataIndex: 'enabledFlag',
-        width: 100,
-        render: (v) => <Switch checked={v === 'Y'} />,
-      },
-      {
-        title: '开始时间',
-        dataIndex: 'startTime',
-        width: 140,
-        render: (v) => (v ? dayjs(v).format('YYYY-MM-DD') : ''),
-      },
-      {
-        title: '结束时间',
-        dataIndex: 'endTime',
-        width: 140,
-        render: (v) => (v ? dayjs(v).format('YYYY-MM-DD') : ''),
+        title: '日记账类别名称',
+        dataIndex: 'jeCategoryName',
       },
       {
         title: '操作',
         dataIndex: 'operation',
-        fixed: 'right',
-        width: 300,
         render: (_, row) => (
-          <>
-            <Button
-              type="primary"
-              size="small"
-              onClick={() => showAccount(row)}
-              style={{ marginRight: '6px' }}
-            >
-              核算主体
-            </Button>
-            <Button
-              type="primary"
-              size="small"
-              onClick={() => showMapping(row)}
-              style={{ marginRight: '6px' }}
-            >
-              接口映射
-            </Button>
-            <Button type="primary" size="small" onClick={() => handleEdit(row)}>
-              编辑
-            </Button>
-          </>
+          <Button type="primary" size="small" onClick={() => handleEdit(row)}>
+            编辑
+          </Button>
         ),
       },
     ],
@@ -149,7 +87,7 @@ function PersonnelSearch() {
   function fetchData() {
     const { current, pageSize } = pagination;
     setLoading(true);
-    $fetch(Url.getSystemSource, {
+    $fetch(Url.getBusinessType, {
       page: {
         pageNo: current,
         pageSize,
@@ -179,8 +117,6 @@ function PersonnelSearch() {
 
   const handleClose = (refresh?: boolean) => {
     setVisible(false);
-    setAccountShow(false);
-    setMappingShow(false);
 
     if (refresh) {
       fetchData();
@@ -228,9 +164,6 @@ function PersonnelSearch() {
       />
       {visible && (
         <DrawerForm visible row={rowRef.current} handleClose={handleClose} />
-      )}
-      {accountShow && (
-        <AccountDrawer visible row={rowRef.current} handleClose={handleClose} />
       )}
     </Card>
   );

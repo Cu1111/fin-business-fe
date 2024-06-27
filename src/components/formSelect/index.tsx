@@ -19,12 +19,23 @@ const FormSelect = (props: FormSelectProps) => {
     renderLabel,
     keyValue = 'value',
     labelValue = 'label',
+    labelInValue,
     ...others
   } = props;
+
   const [options, setOptions] = useState([]);
   const [fetching, setFetching] = useState(true);
 
   const refFetchId = useRef<number>();
+
+  const handleOnChange = (val, option) => {
+    console.log(val, option, '12312');
+    if (labelInValue) {
+      onChange?.(option.extra, option);
+    } else {
+      onChange?.(val, option);
+    }
+  };
 
   const debouncedFetchData = debounce(async (filter) => {
     refFetchId.current = Date.now();
@@ -38,9 +49,10 @@ const FormSelect = (props: FormSelectProps) => {
           return {
             value: v?.[keyValue],
             label: renderLabel ? renderLabel(v) : v?.[labelValue],
+            extra: v,
           };
         });
-
+        console.log('options', options);
         setOptions(options);
       }
     });
@@ -50,8 +62,9 @@ const FormSelect = (props: FormSelectProps) => {
     <Select
       {...others}
       value={value}
-      onChange={onChange}
+      onChange={handleOnChange}
       options={options}
+      labelInValue={labelInValue}
       notFoundContent={
         fetching ? (
           <div
@@ -81,9 +94,6 @@ const FormSelect = (props: FormSelectProps) => {
           debouncedFetchData('');
         }
       }}
-      // onBlur={() => {
-      //   setOptions(null);
-      // }}
       onSearch={debouncedFetchData}
     />
   );

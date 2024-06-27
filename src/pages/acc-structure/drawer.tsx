@@ -84,7 +84,7 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
       >
         <Form.Item
           label="会计科目结构"
-          field="dictType"
+          field="accStructureCode"
           rules={[{ required: true }]}
         >
           <FormSelect

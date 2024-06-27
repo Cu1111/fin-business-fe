@@ -35,8 +35,13 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
     try {
       await form.validate();
       const data = form.getFields();
+      const { startTime, endTime, enabledFlag } = data;
       const params = {
         ...data,
+        tableName: 'CUX_BUSINESS_INTERFACE',
+        startTime: startTime && dayjs(startTime).valueOf(),
+        endTime: endTime && dayjs(endTime).valueOf(),
+        enabledFlag: enabledFlag === true ? 'Y' : 'N',
       };
       console.log(data, params, 'data');
       const fetchUrl = row ? Url.updateSystemSource : Url.addSystemSource;
@@ -83,36 +88,45 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         wrapperCol={{ span: 17 }}
       >
         <Form.Item
-          label="会计科目结构"
-          field="dictType"
+          label="业务系统代码"
+          field="systemSourceCode"
           rules={[{ required: true }]}
         >
           <FormSelect
             showSearch
             onFetchData={DataFetch(Url.searchDictValues, {
-              dictType: 'ACC_STRUCTURE',
+              dictType: 'SYSTEM_SOURCE',
             })}
             renderLabel={(v) => `${v.value}/${v.label}`}
             allowClear
           />
         </Form.Item>
-        <Form.Item label="段值" field="segment" rules={[{ required: true }]}>
-          <Input allowClear />
-        </Form.Item>
-        <Form.Item label="段值描述" field="segmentDesc">
-          <Input allowClear />
-        </Form.Item>
         <Form.Item
-          label="数据字典类型"
-          field="dictType"
+          label="日记账来源"
+          field="jeSource"
           rules={[{ required: true }]}
         >
           <FormSelect
             showSearch
-            onFetchData={DataFetch(Url.searchDictType)}
+            onFetchData={DataFetch(Url.searchDictValues, {
+              dictType: 'JE_SOURCE',
+            })}
             renderLabel={(v) => `${v.value}/${v.label}`}
             allowClear
           />
+        </Form.Item>
+        <Form.Item
+          label="是否启用"
+          field="enabledFlag"
+          triggerPropName="checked"
+        >
+          <Switch />
+        </Form.Item>
+        <Form.Item label="开始时间" field="startTime">
+          <DatePicker />
+        </Form.Item>
+        <Form.Item label="结束时间" field="endTime">
+          <DatePicker />
         </Form.Item>
       </Form>
     </Drawer>

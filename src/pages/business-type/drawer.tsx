@@ -35,18 +35,17 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
     try {
       await form.validate();
       const data = form.getFields();
-      const { startTime, endTime, enabledFlag, dictType } = data;
-      const { id: dictTypeId, value } = dictType;
+      const {
+        jeCategory: { label, value },
+      } = data;
+
       const params = {
         ...data,
-        dictTypeId,
-        dictType: value,
-        startTime: startTime && dayjs(startTime).valueOf(),
-        endTime: endTime && dayjs(endTime).valueOf(),
-        enabledFlag: enabledFlag === true ? 'Y' : 'N',
+        jeCategory: value,
+        jeCategoryName: label,
       };
       console.log(data, params, 'data');
-      const fetchUrl = row ? Url.updateDictValues : Url.addDictValues;
+      const fetchUrl = row ? Url.updateBusinessType : Url.addBusinessType;
       $fetch(fetchUrl, params).then((res) => {
         Notification.success({
           title: '成功',
@@ -61,21 +60,21 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
 
   useEffect(() => {
     if (row) {
-      const { enabledFlag, dictType, dictTypeId, dictDesc, ...other } = row;
-      console.log(row, 'row');
+      const { jeCategory, jeCategoryName, ...other } = row;
+
       const data = {
         ...other,
-        dictType: { value: dictType, label: dictDesc, id: dictTypeId },
-        enabledFlag: enabledFlag === 'Y',
+        jeCategory: { value: jeCategory, label: jeCategoryName },
       };
       console.log(data, 'data');
+
       form.setFieldsValue(data);
     }
   }, []);
 
   return (
     <Drawer
-      width={400}
+      width={500}
       title={<span>{row ? '编辑' : '新增'}</span>}
       visible={visible}
       confirmLoading={confirmLoading}
@@ -92,42 +91,30 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         labelCol={{ span: 7 }}
         wrapperCol={{ span: 17 }}
       >
-        <Form.Item label="类型" field="dictType" rules={[{ required: true }]}>
+        <Form.Item
+          label="业务类型"
+          field="businessTypeCode"
+          rules={[{ required: true }]}
+        >
+          <Input allowClear />
+        </Form.Item>
+        <Form.Item
+          label="业务类型名称"
+          field="businessTypeName"
+          rules={[{ required: true }]}
+        >
+          <Input allowClear />
+        </Form.Item>
+        <Form.Item label="日记账类别" field="jeCategory">
           <FormSelect
             showSearch
+            onFetchData={DataFetch(Url.searchDictValues, {
+              dictType: 'JE_CATEGORY',
+            })}
             labelInValue
-            onFetchData={DataFetch(Url.searchDictType)}
             renderLabel={(v) => `${v.value}/${v.label}`}
-            keyValue="id"
             allowClear
           />
-        </Form.Item>
-        <Form.Item
-          label="选项Code"
-          field="dictCode"
-          rules={[{ required: true }]}
-        >
-          <Input allowClear />
-        </Form.Item>
-        <Form.Item
-          label="选项描述"
-          field="dictName"
-          rules={[{ required: true }]}
-        >
-          <Input allowClear />
-        </Form.Item>
-        <Form.Item
-          label="是否启用"
-          field="enabledFlag"
-          triggerPropName="checked"
-        >
-          <Switch />
-        </Form.Item>
-        <Form.Item label="开始时间" field="startTime">
-          <DatePicker />
-        </Form.Item>
-        <Form.Item label="结束时间" field="endTime">
-          <DatePicker />
         </Form.Item>
       </Form>
     </Drawer>

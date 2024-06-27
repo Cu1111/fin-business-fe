@@ -48,6 +48,10 @@ export const routes: IRoute[] = [
     name: '系统来源',
     key: 'system-source',
   },
+  {
+    name: '业务类型',
+    key: 'business-type',
+  },
 ];
 
 export const getName = (path: string, routes) => {
