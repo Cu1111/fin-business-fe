@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { Select, Spin } from '@arco-design/web-react';
 import debounce from 'lodash/debounce';
 
@@ -20,19 +20,28 @@ const FormSelect = (props: FormSelectProps) => {
     keyValue = 'value',
     labelValue = 'label',
     labelInValue,
+    mode,
     ...others
   } = props;
 
   const [options, setOptions] = useState([]);
   const [fetching, setFetching] = useState(true);
+  const newValue = useMemo(() => {
+    if (renderLabel && labelInValue && mode !== 'multiple' && value) {
+      return { ...(value as any), label: renderLabel(value) };
+    }
+    console.log(value);
+    return value;
+  }, [value]);
 
   const refFetchId = useRef<number>();
 
   const handleOnChange = (val, option) => {
-    console.log(val, option, '12312');
     if (labelInValue) {
       onChange?.(option.extra, option);
     } else {
+      console.log(val, option, '12312');
+
       onChange?.(val, option);
     }
   };
@@ -61,10 +70,12 @@ const FormSelect = (props: FormSelectProps) => {
   return (
     <Select
       {...others}
-      value={value}
+      value={newValue}
       onChange={handleOnChange}
       options={options}
       labelInValue={labelInValue}
+      mode={mode}
+      filterOption={false}
       notFoundContent={
         fetching ? (
           <div

@@ -52,6 +52,18 @@ export const routes: IRoute[] = [
     name: '业务类型',
     key: 'business-type',
   },
+  {
+    name: '业务场景',
+    key: 'business-scene',
+  },
+  {
+    name: '业务事件',
+    key: 'business-event',
+  },
+  {
+    name: '智能映射表单',
+    key: 'dict-map',
+  },
 ];
 
 export const getName = (path: string, routes) => {

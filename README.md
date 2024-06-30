@@ -1,8 +1,5 @@
-# Arco Design Pro
+# 业财结合系统
 
-## 快速开始
-
-```
 // 初始化项目
 npm install
 
