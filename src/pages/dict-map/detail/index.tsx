@@ -7,10 +7,11 @@ import {
   Button,
   Notification,
   Space,
-  Typography,
   Switch,
 } from '@arco-design/web-react';
 import { IconDownload, IconPlus } from '@arco-design/web-react/icon';
+import { IconLeft } from '@arco-design/web-react/icon';
+import { useParams, useHistory } from 'react-router-dom';
 import { $fetch } from '@/utils';
 import dayjs from 'dayjs';
 import SearchForm from './form';
@@ -18,7 +19,9 @@ import DrawerForm from './drawer';
 import styles from './style/index.module.less';
 import Url from './url';
 
-function PersonnelSearch() {
+function DictMapDetail() {
+  const history = useHistory();
+
   const [data, setData] = useState([]);
   const [pagination, setPatination] = useState<PaginationProps>({
     sizeCanChange: true,
@@ -30,7 +33,9 @@ function PersonnelSearch() {
   const [loading, setLoading] = useState(true);
   const [formParams, setFormParams] = useState({});
   const [visible, setVisible] = useState<boolean>(false); // 新增修改弹窗的显示
-  const [detailShow, setDetailShow] = useState<boolean>(false); // 明细映射
+  const [dictMapData, setDictMapData] = useState<any>({});
+
+  const { dictMapId } = useParams();
 
   const rowRef = useRef(null);
 
@@ -48,52 +53,32 @@ function PersonnelSearch() {
     });
   };
 
-  const showDetail = (row) => {
-    rowRef.current = row;
-    setDetailShow(true);
-  };
-
   const columns = useMemo<Array<TableColumnProps>>(
     () => [
       {
-        title: '映射分类代码',
-        dataIndex: 'dictMapClassValue',
+        title: '来源编码',
+        dataIndex: 'sourceTypeValue',
         width: 160,
       },
       {
-        title: '映射分类说明',
-        dataIndex: 'dictMapClassValueDesc',
+        title: '来源描述',
+        dataIndex: 'sourceTypeValueName',
         width: 160,
       },
       {
-        title: '映射类型代码',
-        dataIndex: 'dictMapTypeValue',
+        title: '目标编码',
+        dataIndex: 'targetTypeValue',
         width: 160,
       },
       {
-        title: '映射类型说明',
-        dataIndex: 'dictMapTypeValueDesc',
+        title: '目标描述',
+        dataIndex: 'targetTypeValueName',
         width: 160,
       },
       {
-        title: '来源类型',
-        dataIndex: 'dictMapSourceType',
-        width: 100,
-      },
-      {
-        title: '来源类型描述',
-        dataIndex: 'dictMapSourceTypeDesc',
-        width: 160,
-      },
-      {
-        title: '目标类型',
-        dataIndex: 'dictMapTargetType',
-        width: 160,
-      },
-      {
-        title: '目标类型描述',
-        dataIndex: 'dictMapSourceTypeDesc',
-        width: 160,
+        title: '备注',
+        dataIndex: 'comment',
+        width: 120,
       },
       {
         title: '是否启用',
@@ -119,24 +104,25 @@ function PersonnelSearch() {
         width: 200,
         fixed: 'right',
         render: (_, row) => (
-          <>
-            <Button
-              type="primary"
-              size="small"
-              onClick={() => showDetail(row)}
-              style={{ marginRight: '6px' }}
-            >
-              明细映射
-            </Button>
-            <Button type="primary" size="small" onClick={() => handleEdit(row)}>
-              编辑
-            </Button>
-          </>
+          <Button type="primary" size="small" onClick={() => handleEdit(row)}>
+            编辑
+          </Button>
         ),
       },
     ],
     []
   );
+
+  useEffect(() => {
+    $fetch(Url.getDictMap, {
+      dictMapId,
+      page: { pageNo: 1, pageSize: 1 },
+    }).then((res) => {
+      const { pageList } = res;
+      const data = pageList[0] || {};
+      setDictMapData(data);
+    });
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -145,7 +131,9 @@ function PersonnelSearch() {
   function fetchData() {
     const { current, pageSize } = pagination;
     setLoading(true);
-    $fetch(Url.getDictMap, {
+    console.log(formParams, 'formParams');
+    $fetch(Url.getDictMapValues, {
+      dictMapId,
       page: {
         pageNo: current,
         pageSize,
@@ -175,7 +163,6 @@ function PersonnelSearch() {
 
   const handleClose = (refresh?: boolean) => {
     setVisible(false);
-
     if (refresh) {
       fetchData();
     }
@@ -195,37 +182,57 @@ function PersonnelSearch() {
   }
 
   return (
-    <Card>
-      <SearchForm onSearch={handleSearch} />
-
-      <div className={styles['button-group']}>
-        <Space>
-          <Button type="primary" icon={<IconPlus />} onClick={handleAdd}>
-            新增
-          </Button>
-          <Button onClick={handleNoSupport}>批量导入</Button>
-        </Space>
-        <Space>
-          <Button icon={<IconDownload />} onClick={handleNoSupport}>
-            下载
-          </Button>
-        </Space>
+    <>
+      <div
+        style={{ lineHeight: '32px', marginTop: '-10px', marginBottom: '8px' }}
+      >
+        <IconLeft
+          style={{ cursor: 'pointer', marginRight: '10px' }}
+          onClick={() => {
+            history.push(`/dict-map`);
+          }}
+        />
+        <span>
+          {dictMapData?.dictMapClassValueDesc}-{dictMapData?.dictMapClassValue}
+        </span>
       </div>
-      <Table
-        rowKey="dictValueId"
-        loading={loading}
-        onChange={onChangeTable}
-        pagination={pagination}
-        columns={columns}
-        scroll={{ x: true, y: true }}
-        data={data}
-      />
-      {visible && (
-        <DrawerForm visible row={rowRef.current} handleClose={handleClose} />
-      )}
-    </Card>
+      <Card>
+        <SearchForm onSearch={handleSearch} dictMapData={dictMapData} />
+
+        <div className={styles['button-group']}>
+          <Space>
+            <Button type="primary" icon={<IconPlus />} onClick={handleAdd}>
+              新增
+            </Button>
+            <Button onClick={handleNoSupport}>批量导入</Button>
+          </Space>
+          <Space>
+            <Button icon={<IconDownload />} onClick={handleNoSupport}>
+              下载
+            </Button>
+          </Space>
+        </div>
+        <Table
+          rowKey="dictValueId"
+          loading={loading}
+          onChange={onChangeTable}
+          pagination={pagination}
+          columns={columns}
+          scroll={{ x: true, y: true }}
+          data={data}
+        />
+        {visible && (
+          <DrawerForm
+            visible
+            row={rowRef.current}
+            handleClose={handleClose}
+            dictMapData={dictMapData}
+          />
+        )}
+      </Card>
+    </>
   );
 }
 
-PersonnelSearch.display = 'PersonnelSearch';
-export default PersonnelSearch;
+DictMapDetail.display = 'DictMapDetail';
+export default DictMapDetail;

@@ -7,8 +7,11 @@ export type IRoute = AuthParams & {
   // 当前页是否展示面包屑
   breadcrumb?: boolean;
   children?: IRoute[];
+  path?: string; // 用于key和path不同的情况，比如动态路由
   // 当前路由是否渲染菜单项，为 true 的话不会在菜单中显示，但可通过路由地址访问。
   ignore?: boolean;
+  filePath?: string;
+  exact?: boolean;
 };
 
 export const routes: IRoute[] = [
@@ -63,6 +66,29 @@ export const routes: IRoute[] = [
   {
     name: '智能映射表单',
     key: 'dict-map',
+    filePath: 'dict-map/main',
+    exact: true,
+    children: [
+      {
+        name: '映射明细',
+        key: 'dict-map/detail',
+        path: 'dict-map/detail/:dictMapId',
+        ignore: true,
+      },
+    ],
+  },
+  {
+    name: '入账规则',
+    key: 'entry-rule',
+    filePath: 'entry-rule/main',
+    // children: [
+    //   {
+    //     name: '映射明细',
+    //     key: 'dict-map/detail',
+    //     path: 'dict-map/detail/:dictMapId',
+    //     ignore: true,
+    //   },
+    // ],
   },
 ];
 

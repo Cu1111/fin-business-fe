@@ -1,5 +1,11 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
-import { Switch, Route, Redirect, useHistory } from 'react-router-dom';
+import {
+  Switch,
+  Route,
+  Redirect,
+  useHistory,
+  matchPath,
+} from 'react-router-dom';
 import { Layout, Menu, Breadcrumb, Spin } from '@arco-design/web-react';
 import cs from 'classnames';
 import {
@@ -62,7 +68,9 @@ function getFlattenRoutes(routes) {
       );
       if (route.key && (!route.children || !visibleChildren.length)) {
         try {
-          route.component = lazyload(() => import(`./pages/${route.key}`));
+          route.component = lazyload(
+            () => import(`./pages/${route?.filePath || route.key}`)
+          );
           res.push(route);
         } catch (e) {
           console.error(e);
@@ -197,10 +205,21 @@ function PageLayout() {
   }
 
   useEffect(() => {
-    const routeConfig = routeMap.current.get(pathname);
+    const { key } =
+      flattenRoutes.find((route) => {
+        if (
+          matchPath(pathname, {
+            path: '/' + (route?.path || route?.key),
+            exact: true,
+          })
+        ) {
+          return true;
+        }
+      }) || {};
+    const routeConfig = routeMap.current.get(`/${key}`);
     setBreadCrumb(routeConfig || []);
     updateMenuStatus();
-  }, [pathname]);
+  }, [pathname, flattenRoutes]);
 
   return (
     <Layout className={styles.layout}>
@@ -261,8 +280,9 @@ function PageLayout() {
                     return (
                       <Route
                         key={index}
-                        path={`/${route.key}`}
+                        path={`/${route?.path || route.key}`}
                         component={route.component}
+                        exact={route?.exact || false}
                       />
                     );
                   })}
