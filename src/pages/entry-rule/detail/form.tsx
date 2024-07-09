@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Form, Button, Grid } from '@arco-design/web-react';
+import { Form, Button, Grid, Input } from '@arco-design/web-react';
 import { GlobalContext } from '@/context';
 import { IconSearch, IconRefresh } from '@arco-design/web-react/icon';
 import FormSelect from '@/components/formSelect';
@@ -12,9 +12,7 @@ const { useForm } = Form;
 
 function SearchForm(props: {
   onSearch: (values: Record<string, any>) => void;
-  dictMapData: any;
 }) {
-  const { dictMapData } = props;
   const { lang } = useContext(GlobalContext);
 
   const [form] = useForm();
@@ -23,8 +21,6 @@ function SearchForm(props: {
     const values = form.getFieldsValue();
     props.onSearch(values);
   };
-
-  const { dictMapSourceType, dictMapTargetType } = dictMapData || {};
 
   const colSpan = lang === 'zh-CN' ? 8 : 12;
 
@@ -39,28 +35,8 @@ function SearchForm(props: {
       >
         <Row gutter={24}>
           <Col span={colSpan}>
-            <Form.Item label="来源编码" field="sourceTypeValue">
-              <FormSelect
-                showSearch
-                onFetchData={DataFetch(Url.searchDictValues, {
-                  dictType: dictMapSourceType,
-                })}
-                renderLabel={(v) => `${v.value}/${v.label}`}
-                allowClear
-              />
-            </Form.Item>
-          </Col>
-
-          <Col span={colSpan}>
-            <Form.Item label="目标编码" field="targetTypeValue">
-              <FormSelect
-                showSearch
-                onFetchData={DataFetch(Url.searchDictValues, {
-                  dictType: dictMapTargetType,
-                })}
-                renderLabel={(v) => `${v.value}/${v.label}`}
-                allowClear
-              />
+            <Form.Item label="借/贷" field="sourceTypeValue">
+              <Input />
             </Form.Item>
           </Col>
         </Row>

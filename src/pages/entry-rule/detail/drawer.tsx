@@ -19,7 +19,7 @@ import Url from './url';
 interface DrawerFormProps {
   visible: boolean;
   handleClose: (refresh?: boolean) => void;
-  dictMapData: any;
+  ruleData: any;
   row: any;
 }
 
@@ -28,10 +28,9 @@ const { useForm } = Form;
 const DatePicker: any = dp;
 
 const DrawerForm: React.FC<DrawerFormProps> = (props) => {
-  const { visible, handleClose, row, dictMapData } = props;
-  const { dictMapSourceType, dictMapTargetType } = dictMapData;
+  const { visible, handleClose, row } = props;
   const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
-  const { dictMapId } = useParams();
+  const { accRuleId } = useParams();
 
   const [form] = useForm();
 
@@ -39,23 +38,20 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
     try {
       await form.validate();
       const data = form.getFields();
-      const {
-        sourceTypeValue,
-        targetTypeValue,
-        startTime,
-        endTime,
-        enabledFlag,
-      } = data;
-      const params = {
-        dictMapId,
+      const { startTime, endTime, enabledFlag } = data;
+      const params: any = {
+        accRuleId,
         ...data,
-        sourceTypeValue: sourceTypeValue?.value,
-        targetTypeValue: targetTypeValue?.value,
         startTime: startTime && dayjs(startTime).valueOf(),
         endTime: endTime && dayjs(endTime).valueOf(),
         enabledFlag: enabledFlag === true ? 'Y' : 'N',
       };
-      const fetchUrl = row ? Url.updateDictMapValues : Url.addDictMapValues;
+      const fetchUrl = row ? Url.updateAccRuleLine : Url.addAccRuleLine;
+
+      if (row) {
+        const { accRuleLineId } = row;
+        params.accRuleLineId = accRuleLineId;
+      }
 
       $fetch(fetchUrl, params).then((res) => {
         Notification.success({
@@ -71,33 +67,14 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
 
   useEffect(() => {
     if (row) {
-      const {
-        sourceTypeValue,
-        sourceTypeValueName,
-        targetTypeValue,
-        targetTypeValueName,
-        enabledFlag,
-        ...other
-      } = row;
+      const { enabledFlag, ...other } = row;
       const data = {
         ...other,
-        sourceTypeValue: {
-          label: sourceTypeValueName,
-          value: sourceTypeValue,
-        },
-        targetTypeValue: {
-          label: targetTypeValue,
-          value: targetTypeValueName,
-        },
         enabledFlag: enabledFlag === 'Y',
       };
       form.setFieldsValue(data);
     }
   }, []);
-
-  const onFieldValueChange = (value, values) => {
-    console.log(value, values, 'onFieldValueChange');
-  };
 
   return (
     <Drawer
@@ -117,40 +94,17 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         labelAlign="right"
         labelCol={{ span: 7 }}
         wrapperCol={{ span: 17 }}
-        onChange={onFieldValueChange}
       >
-        <Form.Item
-          label="来源编码"
-          field="sourceTypeValue"
-          rules={[{ required: true, message: '必填' }]}
-        >
-          <FormSelect
-            showSearch
-            onFetchData={DataFetch(Url.searchDictValues, {
-              dictType: dictMapSourceType,
-            })}
-            labelInValue
-            renderLabel={(v) => `${v.value}/${v.label}`}
-            allowClear
-          />
+        <Form.Item label="借/贷" field="drCr" rules={[{ required: true }]}>
+          <Input placeholder="请输入" allowClear />
         </Form.Item>
-
         <Form.Item
-          label="目标编码"
-          field="targetTypeValue"
-          rules={[{ required: true, message: '必填' }]}
+          label="金额方向"
+          field="amountDir"
+          rules={[{ required: true }]}
         >
-          <FormSelect
-            showSearch
-            onFetchData={DataFetch(Url.searchDictValues, {
-              dictType: dictMapTargetType,
-            })}
-            labelInValue
-            renderLabel={(v) => `${v.value}/${v.label}`}
-            allowClear
-          />
+          <Input placeholder="请输入" allowClear />
         </Form.Item>
-
         <Form.Item
           label="是否启用"
           field="enabledFlag"
@@ -158,17 +112,11 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         >
           <Switch />
         </Form.Item>
-
         <Form.Item label="开始时间" field="startTime">
           <DatePicker />
         </Form.Item>
-
         <Form.Item label="结束时间" field="endTime">
           <DatePicker />
-        </Form.Item>
-
-        <Form.Item label="备注" field="comment">
-          <Input.TextArea maxLength={100} />
         </Form.Item>
       </Form>
     </Drawer>

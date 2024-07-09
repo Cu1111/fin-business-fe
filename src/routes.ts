@@ -81,14 +81,14 @@ export const routes: IRoute[] = [
     name: '入账规则',
     key: 'entry-rule',
     filePath: 'entry-rule/main',
-    // children: [
-    //   {
-    //     name: '映射明细',
-    //     key: 'dict-map/detail',
-    //     path: 'dict-map/detail/:dictMapId',
-    //     ignore: true,
-    //   },
-    // ],
+    children: [
+      {
+        name: '映射明细',
+        key: 'entry-rule/detail',
+        path: 'entry-rule/detail/:accRuleId',
+        ignore: true,
+      },
+    ],
   },
 ];
 

@@ -50,8 +50,8 @@ function PersonnelSearch() {
   };
 
   const showDetail = (row) => {
-    const { dictMapId } = row;
-    history.push(`/entry-rule/detail/${dictMapId}`);
+    const { accRuleId } = row;
+    history.push(`/entry-rule/detail/${accRuleId}`);
   };
 
   const columns = useMemo<Array<TableColumnProps>>(
@@ -147,7 +147,7 @@ function PersonnelSearch() {
               onClick={() => showDetail(row)}
               style={{ marginRight: '6px' }}
             >
-              明细行
+              规则行
             </Button>
             <Button type="primary" size="small" onClick={() => handleEdit(row)}>
               编辑

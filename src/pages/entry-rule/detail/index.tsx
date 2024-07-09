@@ -33,14 +33,21 @@ function DictMapDetail() {
   const [loading, setLoading] = useState(true);
   const [formParams, setFormParams] = useState({});
   const [visible, setVisible] = useState<boolean>(false); // 新增修改弹窗的显示
-  const [dictMapData, setDictMapData] = useState<any>({});
+  const [detailShow, setDetailShow] = useState<boolean>(false); // 明细规则的侧滑展示
 
-  const { dictMapId } = useParams();
+  const [ruleData, setRuleData] = useState<any>({});
+
+  const { accRuleId } = useParams();
 
   const rowRef = useRef(null);
 
   const handleEdit = (row) => {
     console.log(row, 'row');
+    rowRef.current = row;
+    setVisible(true);
+  };
+
+  const showDetail = (row) => {
     rowRef.current = row;
     setVisible(true);
   };
@@ -56,29 +63,19 @@ function DictMapDetail() {
   const columns = useMemo<Array<TableColumnProps>>(
     () => [
       {
-        title: '来源编码',
-        dataIndex: 'sourceTypeValue',
-        width: 160,
+        title: '序号',
+        dataIndex: 'lineNumber',
+        width: 100,
       },
       {
-        title: '来源描述',
-        dataIndex: 'sourceTypeValueName',
-        width: 160,
-      },
-      {
-        title: '目标编码',
-        dataIndex: 'targetTypeValue',
-        width: 160,
-      },
-      {
-        title: '目标描述',
-        dataIndex: 'targetTypeValueName',
-        width: 160,
-      },
-      {
-        title: '备注',
-        dataIndex: 'comment',
+        title: '借/贷',
+        dataIndex: 'drCr',
         width: 120,
+      },
+      {
+        title: '金额方向',
+        dataIndex: 'amountDir',
+        width: 160,
       },
       {
         title: '是否启用',
@@ -104,9 +101,19 @@ function DictMapDetail() {
         width: 200,
         fixed: 'right',
         render: (_, row) => (
-          <Button type="primary" size="small" onClick={() => handleEdit(row)}>
-            编辑
-          </Button>
+          <>
+            <Button
+              type="primary"
+              size="small"
+              onClick={() => showDetail(row)}
+              style={{ marginRight: '6px' }}
+            >
+              明细规则
+            </Button>
+            <Button type="primary" size="small" onClick={() => handleEdit(row)}>
+              编辑
+            </Button>
+          </>
         ),
       },
     ],
@@ -114,13 +121,13 @@ function DictMapDetail() {
   );
 
   useEffect(() => {
-    $fetch(Url.getDictMap, {
-      dictMapId,
+    $fetch(Url.getAccRule, {
+      accRuleId,
       page: { pageNo: 1, pageSize: 1 },
     }).then((res) => {
       const { pageList } = res;
       const data = pageList[0] || {};
-      setDictMapData(data);
+      setRuleData(data);
     });
   }, []);
 
@@ -132,8 +139,8 @@ function DictMapDetail() {
     const { current, pageSize } = pagination;
     setLoading(true);
     console.log(formParams, 'formParams');
-    $fetch(Url.getDictMapValues, {
-      dictMapId,
+    $fetch(Url.getAccRuleLine, {
+      accRuleId,
       page: {
         pageNo: current,
         pageSize,
@@ -183,7 +190,7 @@ function DictMapDetail() {
 
   return (
     <>
-      <div
+      {/* <div
         style={{ lineHeight: '32px', marginTop: '-10px', marginBottom: '8px' }}
       >
         <IconLeft
@@ -195,9 +202,9 @@ function DictMapDetail() {
         <span>
           {dictMapData?.dictMapClassValueDesc}-{dictMapData?.dictMapClassValue}
         </span>
-      </div>
+      </div> */}
       <Card>
-        <SearchForm onSearch={handleSearch} dictMapData={dictMapData} />
+        <SearchForm onSearch={handleSearch} />
 
         <div className={styles['button-group']}>
           <Space>
@@ -226,7 +233,7 @@ function DictMapDetail() {
             visible
             row={rowRef.current}
             handleClose={handleClose}
-            dictMapData={dictMapData}
+            ruleData={ruleData}
           />
         )}
       </Card>
