@@ -1,9 +1,11 @@
 import React, { useContext } from 'react';
-import { Form, Button, Grid, Input } from '@arco-design/web-react';
+import { Form, Button, Grid, Select } from '@arco-design/web-react';
 import { GlobalContext } from '@/context';
 import { IconSearch, IconRefresh } from '@arco-design/web-react/icon';
 import FormSelect from '@/components/formSelect';
 import { DataFetch } from '@/utils';
+import { JIEDAI_FLAG } from './constants';
+
 import Url from './url';
 import styles from './style/index.module.less';
 
@@ -30,13 +32,13 @@ function SearchForm(props: {
         form={form}
         className={styles['search-form']}
         labelAlign="left"
-        labelCol={{ span: 6 }}
-        wrapperCol={{ span: 18 }}
+        labelCol={{ span: 4 }}
+        wrapperCol={{ span: 20 }}
       >
         <Row gutter={24}>
           <Col span={colSpan}>
-            <Form.Item label="借/贷" field="sourceTypeValue">
-              <Input />
+            <Form.Item label="借/贷" field="drCr">
+              <Select options={JIEDAI_FLAG} allowClear />
             </Form.Item>
           </Col>
         </Row>

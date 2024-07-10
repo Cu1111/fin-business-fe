@@ -14,6 +14,9 @@ const Url = {
   // 入账明细规则
   addAndUpdateAccRuleDetail: `${prefix}/base/addAndUpdateAccRuleDetail`,
   getAccRuleDetail: `${prefix}/base/getAccRuleDetail`,
+
+  getAccRulValue: `${prefix}/base/getAccRulValue`,
+  getTargetColumnList: `${prefix}/base/getTargetColumnList`,
 };
 
 export default Url;

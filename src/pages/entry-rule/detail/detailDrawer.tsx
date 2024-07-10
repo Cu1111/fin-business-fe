@@ -10,10 +10,11 @@ import {
   TableColumnProps,
   Notification,
   Message,
-  Input,
+  Select,
 } from '@arco-design/web-react';
 import dayjs from 'dayjs';
 import FormSelect from '@/components/formSelect';
+import { JIEDAI_FLAG, MONEYDIR_FLAG, DATAMAP_FLAG } from './constants';
 
 import { $fetch, DataFetch } from '@/utils';
 import Url from './url';
@@ -75,17 +76,27 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
     () => [
       {
         title: '段',
-        dataIndex: 'sourceColumnCode',
+        dataIndex: 'segmentDesc',
         width: 100,
       },
       {
         title: '取值类型',
-        dataIndex: 'sourceColumnName',
+        dataIndex: 'valueType',
+        render: (v) => {
+          if (v) {
+            return DATAMAP_FLAG.find((obj) => {
+              if (obj.value === v) {
+                return true;
+              }
+            }).label;
+          }
+          return '';
+        },
         width: 120,
       },
       {
         title: '值',
-        dataIndex: 'targetColumnCode',
+        dataIndex: 'value',
         width: 180,
       },
       {
@@ -95,7 +106,7 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
       },
       {
         title: '数据映射源字段',
-        dataIndex: '',
+        dataIndex: 'dataMapSourceColumn',
       },
       {
         title: '是否启用',
@@ -160,8 +171,7 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
 
   return (
     <Drawer
-      // width={1000}
-      // title={<span>{`${row?.systemSourceCode} 接口映射`}</span>}
+      width={500}
       title="入账明细规则"
       visible={visible}
       footer={null}
@@ -170,10 +180,6 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
       }}
       maskClosable={false}
       unmountOnExit={true}
-      width="100%"
-      height="100%"
-      bodyStyle={{ padding: 0 }}
-      style={{ position: 'fixed', top: 0, left: 0 }}
     >
       <Table
         rowKey="dictValueId"
@@ -223,22 +229,46 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
             labelCol={{ span: 7 }}
             wrapperCol={{ span: 17 }}
           >
+            <Form.Item label="段" field="segment" disabled>
+              <span />
+            </Form.Item>
+
             <Form.Item
-              label="接入方字段代码"
-              field="sourceColumnCode"
+              label="取值类型"
+              field="valueType"
               rules={[{ required: true, message: '必填' }]}
             >
-              <Input allowClear placeholder="请输入" />
+              <Select options={DATAMAP_FLAG} allowClear />
             </Form.Item>
+
+            <Form.Item label="值" field="value" rules={[{ required: true }]}>
+              {(formData) => {
+                console.log('formData', formData);
+                return (
+                  <FormSelect
+                    showSearch
+                    onFetchData={DataFetch(Url.getAccRulValue, {
+                      accRuleLineId,
+                      segment: rowRef.current?.segment,
+                    })}
+                    renderLabel={(v) => `${v.value}/${v.label}`}
+                    labelInValue
+                    allowClear
+                  />
+                );
+              }}
+            </Form.Item>
+
             <Form.Item
-              label="映射字段名称"
-              field="sourceColumnName"
-              rules={[{ required: true, message: '必填' }]}
+              label="说明"
+              field="description"
+              rules={[{ required: true }]}
             >
-              <Input allowClear placeholder="请输入" />
+              <Select options={MONEYDIR_FLAG} allowClear />
             </Form.Item>
+
             <Form.Item label="接口表字段" field="targetColumnCode">
-              <FormSelect
+              {/* <FormSelect
                 showSearch
                 onFetchData={DataFetch(Url.getDBColumn, {
                   tableName: 'system_source_column_map',
@@ -247,7 +277,7 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
                 keyValue="columnName"
                 labelValue="columnComment"
                 allowClear
-              />
+              /> */}
             </Form.Item>
           </Form>
         </Modal>

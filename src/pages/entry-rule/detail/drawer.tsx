@@ -7,11 +7,13 @@ import {
   Message,
   Notification,
   Input,
+  Select,
 } from '@arco-design/web-react';
 import { useParams } from 'react-router-dom';
 
 import dayjs from 'dayjs';
 import FormSelect from '@/components/formSelect';
+import { JIEDAI_FLAG, MONEYDIR_FLAG } from './constants';
 
 import { $fetch, DataFetch } from '@/utils';
 import Url from './url';
@@ -92,18 +94,18 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
       <Form
         form={form}
         labelAlign="right"
-        labelCol={{ span: 7 }}
-        wrapperCol={{ span: 17 }}
+        labelCol={{ span: 5 }}
+        wrapperCol={{ span: 19 }}
       >
         <Form.Item label="借/贷" field="drCr" rules={[{ required: true }]}>
-          <Input placeholder="请输入" allowClear />
+          <Select options={JIEDAI_FLAG} allowClear />
         </Form.Item>
         <Form.Item
           label="金额方向"
           field="amountDir"
           rules={[{ required: true }]}
         >
-          <Input placeholder="请输入" allowClear />
+          <Select options={MONEYDIR_FLAG} allowClear />
         </Form.Item>
         <Form.Item
           label="是否启用"

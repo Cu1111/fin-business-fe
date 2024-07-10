@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Form,
-  Input,
-  Select,
   DatePicker as dp,
   Drawer,
   Switch,
@@ -198,7 +196,7 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         <Form.Item
           label="记账账簿"
           field="accBookDictCode"
-          // rules={[{ required: true, message: '必填' }]}
+          rules={[{ required: true, message: '必填' }]}
         >
           <FormSelect
             showSearch
@@ -214,7 +212,7 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         <Form.Item
           label="业财维度结构"
           field="accStructureDictCode"
-          // rules={[{ required: true, message: '必填' }]}
+          rules={[{ required: true, message: '必填' }]}
         >
           <FormSelect
             showSearch

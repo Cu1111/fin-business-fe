@@ -58,7 +58,7 @@ function PersonnelSearch() {
     () => [
       {
         title: '业务系统',
-        dataIndex: 'dictMapClassValue',
+        dataIndex: 'systemSourceName',
         width: 160,
       },
       {
@@ -147,7 +147,7 @@ function PersonnelSearch() {
               onClick={() => showDetail(row)}
               style={{ marginRight: '6px' }}
             >
-              规则行
+              入账行规则
             </Button>
             <Button type="primary" size="small" onClick={() => handleEdit(row)}>
               编辑
