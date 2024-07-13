@@ -11,6 +11,7 @@ import {
   Notification,
   Message,
   Select,
+  DatePicker as dp,
 } from '@arco-design/web-react';
 import dayjs from 'dayjs';
 import FormSelect from '@/components/formSelect';
@@ -26,6 +27,8 @@ interface DrawerFormProps {
 }
 
 const { useForm } = Form;
+
+const DatePicker: any = dp;
 
 const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
   const { visible, handleClose, row } = props;
@@ -201,13 +204,14 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
             try {
               await form.validate();
               const data = form.getFields();
-              const { enabledFlag } = data;
+              const { enabledFlag, endTime, startTime } = data;
               const params = {
                 ...data,
                 systemSourceId: row?.systemSourceId,
                 enabledFlag: enabledFlag === true ? 'Y' : 'N',
+                endTime: endTime && dayjs(endTime).valueOf(),
+                startTime: startTime && dayjs(startTime).valueOf(),
               };
-              console.log(data, params, 'data');
               return $fetch(Url.addAndUpdateAccRuleDetail, params).then(
                 (res) => {
                   setModalShow(false);
@@ -244,15 +248,18 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
             <Form.Item label="值" field="value" rules={[{ required: true }]}>
               {(formData) => {
                 console.log('formData', formData);
+                const { valueType } = formData;
                 return (
                   <FormSelect
                     showSearch
                     onFetchData={DataFetch(Url.getAccRulValue, {
                       accRuleLineId,
                       segment: rowRef.current?.segment,
+                      valueType,
                     })}
                     renderLabel={(v) => `${v.value}/${v.label}`}
                     labelInValue
+                    disabled={!valueType}
                     allowClear
                   />
                 );
@@ -267,17 +274,27 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
               <Select options={MONEYDIR_FLAG} allowClear />
             </Form.Item>
 
-            <Form.Item label="接口表字段" field="targetColumnCode">
-              {/* <FormSelect
+            <Form.Item label="数据映射源字段" field="dataMapSourceColumn">
+              <FormSelect
                 showSearch
-                onFetchData={DataFetch(Url.getDBColumn, {
-                  tableName: 'system_source_column_map',
-                })}
-                // renderLabel={(v) => `${v.value}/${v.label}`}
-                keyValue="columnName"
-                labelValue="columnComment"
+                onFetchData={DataFetch(Url.getTargetColumnList)}
                 allowClear
-              /> */}
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="是否启用"
+              field="enabledFlag"
+              triggerPropName="checked"
+            >
+              <Switch />
+            </Form.Item>
+
+            <Form.Item label="开始时间" field="startTime">
+              <DatePicker />
+            </Form.Item>
+            <Form.Item label="结束时间" field="endTime">
+              <DatePicker />
             </Form.Item>
           </Form>
         </Modal>
