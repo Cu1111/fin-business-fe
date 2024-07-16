@@ -74,34 +74,54 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
   useEffect(() => {
     if (row) {
       const {
-        dictMapClassValue,
-        dictMapClassValueDesc,
-        dictMapTypeValue,
-        dictMapTypeValueDesc,
-        dictMapTargetType,
-        dictMapTargetTypeDesc,
-        dictMapSourceType,
-        dictMapSourceTypeDesc,
+        systemSourceCode,
+        systemSourceId,
+        systemSourceName,
+        businessTypeId,
+        businessTypeName,
+        businessTypeCode,
+        businessSituationId,
+        businessSituationCode,
+        businessSituationName,
+        businessEventId,
+        businessEventName,
+        businessEventCode,
+        accBookDictCode,
+        accBookDictType,
+        accStructureDictCode,
+        accStructureDictType,
         enabledFlag,
         ...other
       } = row;
       const data = {
         ...other,
-        dictMapClassValue: {
-          label: dictMapClassValueDesc,
-          value: dictMapClassValue,
+        systemSourceId: {
+          id: systemSourceId,
+          label: systemSourceName,
+          value: systemSourceCode,
         },
-        dictMapTypeValue: {
-          label: dictMapTypeValueDesc,
-          value: dictMapTypeValue,
+        businessTypeId: {
+          id: businessTypeId,
+          label: businessTypeName,
+          value: businessTypeCode,
         },
-        dictMapTargetType: {
-          label: dictMapTargetTypeDesc,
-          value: dictMapTargetType,
+        businessSituationId: {
+          id: businessSituationId,
+          label: businessSituationName,
+          value: businessSituationCode,
         },
-        dictMapSourceType: {
-          label: dictMapSourceTypeDesc,
-          value: dictMapSourceType,
+        businessEventId: {
+          id: businessEventId,
+          label: businessEventName,
+          value: businessEventCode,
+        },
+        accBookDictCode: {
+          label: accBookDictType,
+          value: accBookDictCode,
+        },
+        accStructureDictCode: {
+          label: accStructureDictType,
+          value: accStructureDictCode,
         },
         enabledFlag: enabledFlag === 'Y',
       };

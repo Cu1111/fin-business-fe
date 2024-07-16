@@ -12,6 +12,7 @@ import {
   Message,
   Select,
   DatePicker as dp,
+  Input,
 } from '@arco-design/web-react';
 import dayjs from 'dayjs';
 import FormSelect from '@/components/formSelect';
@@ -41,7 +42,7 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
   const [pagination, setPatination] = useState<PaginationProps>({
     sizeCanChange: true,
     showTotal: true,
-    pageSize: 10,
+    pageSize: 100,
     current: 1,
     pageSizeChangeResetCurrent: true,
   });
@@ -61,14 +62,7 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
       },
     })
       .then((res) => {
-        const { page, pageList } = res;
-        setPatination({
-          ...pagination,
-          current: page?.pageNo,
-          pageSize: page?.pageSize,
-          total: page?.totalCount,
-        });
-        setData(pageList);
+        setData(res);
       })
       .finally(() => {
         setLoading(false);
@@ -110,6 +104,7 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
       {
         title: '数据映射源字段',
         dataIndex: 'dataMapSourceColumn',
+        width: 200,
       },
       {
         title: '是否启用',
@@ -133,12 +128,14 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
         title: '操作',
         dataIndex: 'operation',
         fixed: 'right',
+        width: 200,
         render: (_, row) => (
           <Button
             type="primary"
             size="small"
             onClick={() => {
               rowRef.current = row;
+
               setModalShow(true);
             }}
           >
@@ -152,13 +149,14 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
 
   useEffect(() => {
     fetchData();
-  }, [pagination.current, pagination.pageSize]);
+  }, []);
 
   useEffect(() => {
     if (modalShow && rowRef.current != null) {
+      console.log('rowRef.current', rowRef.current);
       const { enabledFlag, ...other } = rowRef.current;
-      const data = { ...other, enabledFlag: enabledFlag === 'Y' };
-      form.setFieldsValue(data);
+      const formData = { ...other, enabledFlag: enabledFlag === 'Y' };
+      form.setFieldsValue(formData);
     } else {
       form.resetFields();
     }
@@ -174,7 +172,7 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
 
   return (
     <Drawer
-      width={500}
+      width={800}
       title="入账明细规则"
       visible={visible}
       footer={null}
@@ -188,14 +186,16 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
         rowKey="dictValueId"
         loading={loading}
         onChange={onChangeTable}
-        pagination={pagination}
+        // pagination={pagination}
         columns={columns}
         scroll={{ x: true, y: true }}
         data={data}
       />
       {modalShow && (
         <Modal
+          style={{ width: '600px' }}
           title={<div style={{ textAlign: 'left' }}>编辑</div>}
+          maskClosable={false}
           visible
           onCancel={() => {
             setModalShow(false);
@@ -204,9 +204,10 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
             try {
               await form.validate();
               const data = form.getFields();
-              const { enabledFlag, endTime, startTime } = data;
+              const { enabledFlag, endTime, startTime, value } = data;
               const params = {
                 ...data,
+                value: value?.value,
                 systemSourceId: row?.systemSourceId,
                 enabledFlag: enabledFlag === true ? 'Y' : 'N',
                 endTime: endTime && dayjs(endTime).valueOf(),
@@ -229,12 +230,18 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
         >
           <Form
             form={form}
-            labelAlign="left"
-            labelCol={{ span: 7 }}
-            wrapperCol={{ span: 17 }}
+            labelAlign="right"
+            labelCol={{ span: 5 }}
+            wrapperCol={{ span: 19 }}
+            onChange={(data) => {
+              if (Object.keys(data).includes('valueType')) {
+                console.log('12312312');
+                form.setFieldsValue({ value: null });
+              }
+            }}
           >
-            <Form.Item label="段" field="segment" disabled>
-              <span />
+            <Form.Item label="段" field="segmentDesc" disabled>
+              <>{rowRef.current?.segmentDesc}</>
             </Form.Item>
 
             <Form.Item
@@ -245,16 +252,20 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
               <Select options={DATAMAP_FLAG} allowClear />
             </Form.Item>
 
-            <Form.Item label="值" field="value" rules={[{ required: true }]}>
+            <Form.Item
+              label="值"
+              field="value"
+              shouldUpdate
+              rules={[{ required: true, message: '必填' }]}
+            >
               {(formData) => {
-                console.log('formData', formData);
-                const { valueType } = formData;
+                const { valueType, segment } = formData;
                 return (
                   <FormSelect
                     showSearch
                     onFetchData={DataFetch(Url.getAccRulValue, {
                       accRuleLineId,
-                      segment: rowRef.current?.segment,
+                      segment,
                       valueType,
                     })}
                     renderLabel={(v) => `${v.value}/${v.label}`}
@@ -265,19 +276,19 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
                 );
               }}
             </Form.Item>
-
-            <Form.Item
-              label="说明"
-              field="description"
-              rules={[{ required: true }]}
-            >
-              <Select options={MONEYDIR_FLAG} allowClear />
-            </Form.Item>
+            {/* 
+            <Form.Item label="说明" field="description" shouldUpdate>
+              {(formData) => {
+                return <span>{formData?.}</span>
+              }}
+            </Form.Item> */}
 
             <Form.Item label="数据映射源字段" field="dataMapSourceColumn">
               <FormSelect
                 showSearch
-                onFetchData={DataFetch(Url.getTargetColumnList)}
+                onFetchData={DataFetch(Url.getTargetColumnList, {
+                  accRuleLineId,
+                })}
                 allowClear
               />
             </Form.Item>

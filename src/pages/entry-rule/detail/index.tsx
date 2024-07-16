@@ -12,16 +12,16 @@ import {
 import { IconDownload, IconPlus } from '@arco-design/web-react/icon';
 import { IconLeft } from '@arco-design/web-react/icon';
 import { useParams, useHistory } from 'react-router-dom';
+import { JIEDAI_OBJ, MONEYDIR_OBJ } from './constants';
 import { $fetch } from '@/utils';
 import dayjs from 'dayjs';
 import SearchForm from './form';
 import DrawerForm from './drawer';
+import DetailDrawer from './detailDrawer';
 import styles from './style/index.module.less';
 import Url from './url';
 
 function DictMapDetail() {
-  const history = useHistory();
-
   const [data, setData] = useState([]);
   const [pagination, setPatination] = useState<PaginationProps>({
     sizeCanChange: true,
@@ -49,7 +49,7 @@ function DictMapDetail() {
 
   const showDetail = (row) => {
     rowRef.current = row;
-    setVisible(true);
+    setDetailShow(true);
   };
 
   const handleNoSupport = () => {
@@ -70,11 +70,13 @@ function DictMapDetail() {
       {
         title: '借/贷',
         dataIndex: 'drCr',
+        render: (v) => JIEDAI_OBJ[v] || '',
         width: 120,
       },
       {
         title: '金额方向',
         dataIndex: 'amountDir',
+        render: (v) => MONEYDIR_OBJ[v] || '',
         width: 160,
       },
       {
@@ -98,7 +100,7 @@ function DictMapDetail() {
       {
         title: '操作',
         dataIndex: 'operation',
-        width: 200,
+        width: 160,
         fixed: 'right',
         render: (_, row) => (
           <>
@@ -170,6 +172,7 @@ function DictMapDetail() {
 
   const handleClose = (refresh?: boolean) => {
     setVisible(false);
+    setDetailShow(false);
     if (refresh) {
       fetchData();
     }
@@ -234,6 +237,13 @@ function DictMapDetail() {
             row={rowRef.current}
             handleClose={handleClose}
             ruleData={ruleData}
+          />
+        )}
+        {detailShow && (
+          <DetailDrawer
+            visible
+            row={rowRef.current}
+            handleClose={handleClose}
           />
         )}
       </Card>

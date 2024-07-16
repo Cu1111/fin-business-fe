@@ -14,6 +14,7 @@ const FormSelect = (props: FormSelectProps) => {
   const {
     value,
     onChange,
+    disabled,
     onFetchData,
     initSearch = true,
     renderLabel,
@@ -38,10 +39,8 @@ const FormSelect = (props: FormSelectProps) => {
 
   const handleOnChange = (val, option) => {
     if (labelInValue) {
-      onChange?.(option.extra, option);
+      onChange?.(option?.extra, option);
     } else {
-      console.log(val, option, '12312');
-
       onChange?.(val, option);
     }
   };
@@ -73,6 +72,7 @@ const FormSelect = (props: FormSelectProps) => {
       value={newValue}
       onChange={handleOnChange}
       options={options}
+      disabled={disabled}
       labelInValue={labelInValue}
       mode={mode}
       filterOption={false}
@@ -101,7 +101,7 @@ const FormSelect = (props: FormSelectProps) => {
         )
       }
       onClick={() => {
-        if (initSearch) {
+        if (!disabled && initSearch) {
           debouncedFetchData('');
         }
       }}

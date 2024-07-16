@@ -58,62 +58,62 @@ function PersonnelSearch() {
     () => [
       {
         title: '业务系统',
-        dataIndex: 'systemSourceName',
+        dataIndex: 'systemSourceCode',
         width: 160,
       },
       {
         title: '业务系统名称',
-        dataIndex: 'dictMapClassValueDesc',
+        dataIndex: 'systemSourceName',
         width: 160,
       },
       {
         title: '业务类型',
-        dataIndex: 'dictMapTypeValue',
+        dataIndex: 'businessTypeCode',
         width: 160,
       },
       {
         title: '业务类型名称',
-        dataIndex: 'dictMapTypeValueDesc',
+        dataIndex: 'businessTypeName',
         width: 160,
       },
       {
         title: '业务场景',
-        dataIndex: 'dictMapSourceType',
+        dataIndex: 'businessSituationCode',
         width: 120,
       },
       {
         title: '业务场景名称',
-        dataIndex: 'dictMapSourceTypeDesc',
+        dataIndex: 'businessSituationName',
         width: 160,
       },
       {
         title: '业务事件',
-        dataIndex: 'dictMapTargetType',
+        dataIndex: 'businessEventCode',
         width: 160,
       },
       {
         title: '业务事件名称',
-        dataIndex: 'dictMapTargetTypeDesc',
+        dataIndex: 'businessEventName',
         width: 160,
       },
       {
         title: 'IPH_PRC',
-        dataIndex: 'dictMapTargetType',
+        dataIndex: 'accBookDictCode',
         width: 160,
       },
       {
         title: '记账账簿名称',
-        dataIndex: 'dictMapTargetTypeDesc',
+        dataIndex: 'accBookDictType',
         width: 160,
       },
       {
         title: '业财维度结构',
-        dataIndex: 'dictMapTargetType',
+        dataIndex: 'accStructureDictCode',
         width: 160,
       },
       {
         title: '业财维度结构名称',
-        dataIndex: 'dictMapTargetTypeDesc',
+        dataIndex: 'accStructureDictType',
         width: 160,
       },
       {
