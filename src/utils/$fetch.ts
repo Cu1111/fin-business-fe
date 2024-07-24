@@ -26,6 +26,8 @@ service.interceptors.response.use(
       if (code === 1) {
         console.log('data', data);
         return data;
+      } else if (code === 401) {
+        window.location.href = '/login';
       } else {
         Notification.error({
           title: '失败',

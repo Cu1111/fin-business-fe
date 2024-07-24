@@ -17,6 +17,7 @@ import {
 import dayjs from 'dayjs';
 import FormSelect from '@/components/formSelect';
 import { JIEDAI_FLAG, MONEYDIR_FLAG, DATAMAP_FLAG } from './constants';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { $fetch, DataFetch } from '@/utils';
 import Url from './url';
@@ -135,7 +136,6 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
             size="small"
             onClick={() => {
               rowRef.current = row;
-
               setModalShow(true);
             }}
           >
@@ -154,8 +154,12 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
   useEffect(() => {
     if (modalShow && rowRef.current != null) {
       console.log('rowRef.current', rowRef.current);
-      const { enabledFlag, ...other } = rowRef.current;
-      const formData = { ...other, enabledFlag: enabledFlag === 'Y' };
+      const { enabledFlag, value, description, ...other } = rowRef.current;
+      const formData = {
+        ...other,
+        value: { value, label: description },
+        enabledFlag: enabledFlag === 'Y',
+      };
       form.setFieldsValue(formData);
     } else {
       form.resetFields();
@@ -203,16 +207,20 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
           onOk={async () => {
             try {
               await form.validate();
-              const data = form.getFields();
-              const { enabledFlag, endTime, startTime, value } = data;
-              const params = {
-                ...data,
+              const formData = form.getFields();
+              const { enabledFlag, endTime, startTime, value } = formData;
+              const lineData = {
+                ...formData,
                 value: value?.value,
                 systemSourceId: row?.systemSourceId,
                 enabledFlag: enabledFlag === true ? 'Y' : 'N',
                 endTime: endTime && dayjs(endTime).valueOf(),
                 startTime: startTime && dayjs(startTime).valueOf(),
               };
+              const index = data.findIndex(
+                (v) => v.segment === formData.segment
+              );
+              const params = cloneDeep(data).toSpliced(index, 1, lineData);
               return $fetch(Url.addAndUpdateAccRuleDetail, params).then(
                 (res) => {
                   setModalShow(false);
@@ -235,7 +243,6 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
             wrapperCol={{ span: 19 }}
             onChange={(data) => {
               if (Object.keys(data).includes('valueType')) {
-                console.log('12312312');
                 form.setFieldsValue({ value: null });
               }
             }}
