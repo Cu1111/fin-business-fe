@@ -157,9 +157,11 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
       const { enabledFlag, value, description, ...other } = rowRef.current;
       const formData = {
         ...other,
-        value: { value, label: description },
         enabledFlag: enabledFlag === 'Y',
       };
+      if (value) {
+        formData.value = { value, label: description };
+      }
       form.setFieldsValue(formData);
     } else {
       form.resetFields();
