@@ -160,7 +160,7 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
         enabledFlag: enabledFlag === 'Y',
       };
       if (value) {
-        formData.value = { value, label: description };
+        formData.value = { value, label: description || '' };
       }
       form.setFieldsValue(formData);
     } else {
@@ -178,14 +178,14 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
 
   return (
     <Drawer
-      width={800}
+      width={1200}
       title="入账明细规则"
       visible={visible}
       footer={null}
       onCancel={() => {
         handleClose();
       }}
-      maskClosable={false}
+      // maskClosable={false}
       unmountOnExit={true}
     >
       <Table
@@ -219,13 +219,16 @@ const DetailDrawer: React.FC<DrawerFormProps> = (props) => {
                 endTime: endTime && dayjs(endTime).valueOf(),
                 startTime: startTime && dayjs(startTime).valueOf(),
               };
-              const index = data.findIndex(
-                (v) => v.segment === formData.segment
-              );
-              const params = cloneDeep(data).toSpliced(index, 1, lineData);
-              return $fetch(Url.addAndUpdateAccRuleDetail, params).then(
+              console.log('formData', formData, lineData);
+
+              // const index = data.findIndex(
+              //   (v) => v.segment === formData.segment
+              // );
+              // const params = cloneDeep(data).toSpliced(index, 1, lineData);
+              return $fetch(Url.addAndUpdateAccRuleDetail, lineData).then(
                 (res) => {
                   setModalShow(false);
+                  fetchData();
                   Notification.success({
                     title: '成功',
                     content: res?.message || '操作成功',

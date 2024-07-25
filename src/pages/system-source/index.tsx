@@ -74,23 +74,23 @@ function PersonnelSearch() {
       },
       {
         title: '业务系统名称',
-        dataIndex: '',
+        dataIndex: 'systemSourceName',
         width: 120,
       },
       {
         title: '日记账来源代码',
         dataIndex: 'jeSource',
-        width: 160,
+        width: 150,
       },
       {
         title: '日记账来源名称',
-        dataIndex: '',
-        width: 200,
+        dataIndex: 'jeSourceName',
+        width: 180,
       },
       {
         title: '接口表名称',
         dataIndex: 'tableName',
-        width: 160,
+        width: 200,
       },
       {
         title: '是否启用',
@@ -116,7 +116,7 @@ function PersonnelSearch() {
         fixed: 'right',
         width: 300,
         render: (_, row) => (
-          <>
+          <div style={{ display: 'flex' }}>
             <Button
               type="primary"
               size="small"
@@ -136,7 +136,7 @@ function PersonnelSearch() {
             <Button type="primary" size="small" onClick={() => handleEdit(row)}>
               编辑
             </Button>
-          </>
+          </div>
         ),
       },
     ],

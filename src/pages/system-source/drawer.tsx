@@ -38,7 +38,6 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
       const { startTime, endTime, enabledFlag } = data;
       const params = {
         ...data,
-        tableName: 'CUX_BUSINESS_INTERFACE',
         startTime: startTime && dayjs(startTime).valueOf(),
         endTime: endTime && dayjs(endTime).valueOf(),
         enabledFlag: enabledFlag === true ? 'Y' : 'N',
@@ -114,6 +113,14 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
             renderLabel={(v) => `${v.value}/${v.label}`}
             allowClear
           />
+        </Form.Item>
+        <Form.Item
+          label="接口表名称"
+          field="tableName"
+          rules={[{ required: true }]}
+          disabled={!!row}
+        >
+          <Input />
         </Form.Item>
         <Form.Item
           label="是否启用"

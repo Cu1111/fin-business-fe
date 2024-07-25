@@ -40,12 +40,11 @@ function SearchForm(props: {
       >
         <Row gutter={24}>
           <Col span={colSpan}>
-            <Form.Item label="系统来源" field="systemSourceId">
+            <Form.Item label="业务系统" field="systemSourceId">
               <FormSelect
                 showSearch
-                onFetchData={DataFetch(Url.searchDictValues, {
-                  dictType: 'MAP_CLASS',
-                })}
+                onFetchData={DataFetch(Url.searchSystemSource)}
+                keyValue="id"
                 renderLabel={(v) => `${v.value}/${v.label}`}
                 allowClear
               />
@@ -56,9 +55,8 @@ function SearchForm(props: {
             <Form.Item label="业务类型" field="businessTypeId">
               <FormSelect
                 showSearch
-                onFetchData={DataFetch(Url.searchDictValues, {
-                  dictType: 'MAP_TYPE',
-                })}
+                onFetchData={DataFetch(Url.searchBusinessType)}
+                keyValue="id"
                 renderLabel={(v) => `${v.value}/${v.label}`}
                 allowClear
               />
@@ -69,7 +67,8 @@ function SearchForm(props: {
             <Form.Item label="业务场景" field="businessSituationId">
               <FormSelect
                 showSearch
-                onFetchData={DataFetch(Url.searchDictType)}
+                onFetchData={DataFetch(Url.searchBusinessSituation)}
+                keyValue="id"
                 renderLabel={(v) => `${v.value}/${v.label}`}
                 allowClear
               />
@@ -80,7 +79,8 @@ function SearchForm(props: {
             <Form.Item label="业务事件" field="businessEventId">
               <FormSelect
                 showSearch
-                onFetchData={DataFetch(Url.searchDictType)}
+                onFetchData={DataFetch(Url.searchBusinessEvent)}
+                keyValue="id"
                 renderLabel={(v) => `${v.value}/${v.label}`}
                 allowClear
               />
@@ -90,7 +90,9 @@ function SearchForm(props: {
             <Form.Item label="记账账簿" field="accBookDictCode">
               <FormSelect
                 showSearch
-                onFetchData={DataFetch(Url.searchDictType)}
+                onFetchData={DataFetch(Url.searchDictValues, {
+                  dictType: 'ACC_BOOK',
+                })}
                 renderLabel={(v) => `${v.value}/${v.label}`}
                 allowClear
               />
