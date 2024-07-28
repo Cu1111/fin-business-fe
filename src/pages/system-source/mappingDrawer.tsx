@@ -239,18 +239,15 @@ const MappingDrawer: React.FC<DrawerFormProps> = (props) => {
             >
               <Input allowClear placeholder="请输入" />
             </Form.Item>
-            <Form.Item
-              label="接口表字段"
-              field="targetColumnCode"
-            >
+            <Form.Item label="接口表字段" field="targetColumnCode">
               <FormSelect
                 showSearch
                 onFetchData={DataFetch(Url.getDBColumn, {
-                  tableName: 'system_source_column_map',
+                  tableName: row?.tableName || '',
                 })}
                 // renderLabel={(v) => `${v.value}/${v.label}`}
-                keyValue='columnName'
-                labelValue='columnComment'
+                keyValue="columnName"
+                labelValue="columnComment"
                 allowClear
               />
             </Form.Item>
