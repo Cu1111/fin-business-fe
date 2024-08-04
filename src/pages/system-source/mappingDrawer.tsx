@@ -247,7 +247,7 @@ const MappingDrawer: React.FC<DrawerFormProps> = (props) => {
                 })}
                 // renderLabel={(v) => `${v.value}/${v.label}`}
                 keyValue="columnName"
-                labelValue="columnComment"
+                labelValue="columnName"
                 allowClear
               />
             </Form.Item>
