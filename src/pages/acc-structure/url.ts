@@ -6,6 +6,7 @@ const Url = {
   updateAccStructure: `${prefix}/base/updateAccStructure`,
   searchDictValues: `${prefix}/base/searchDictValues`,
   searchDictType: `${prefix}/base/searchDictType`,
+  getSegmentType: `${prefix}/base/getSegmentType`,
 };
 
 export default Url;

@@ -64,10 +64,16 @@ function PersonnelSearch() {
         width: 200,
       },
       {
+        title: '段值类型',
+        dataIndex: 'segmentType',
+        width: 200,
+        render: (_, row) =>
+          row.segmentType ? `${row.segmentType}/${row.segmentTypeDesc}` : '',
+      },
+      {
         title: '数据字典',
         dataIndex: 'dictType',
-        render: (_, row) =>
-          row?.dictType && row?.dictDesc && `${row?.dictType}/${row?.dictDesc}`,
+        width: 200,
       },
       {
         title: '操作',
@@ -84,7 +90,7 @@ function PersonnelSearch() {
 
   useEffect(() => {
     fetchData();
-  }, [pagination.current, pagination.pageSize, JSON.stringify(formParams)]);
+  }, [pagination.current, pagination.pageSize, formParams]);
 
   function fetchData() {
     const { current, pageSize } = pagination;

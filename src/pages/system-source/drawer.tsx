@@ -115,6 +115,20 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
           />
         </Form.Item>
         <Form.Item
+          label="会计科目结构"
+          field="accStructureCode"
+          rules={[{ required: true }]}
+        >
+          <FormSelect
+            showSearch
+            onFetchData={DataFetch(Url.searchDictValues, {
+              dictType: 'ACC_STRUCTURE',
+            })}
+            renderLabel={(v) => `${v.value}/${v.label}`}
+            allowClear
+          />
+        </Form.Item>
+        <Form.Item
           label="接口表名称"
           field="tableName"
           rules={[{ required: true }]}

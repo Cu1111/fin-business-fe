@@ -88,6 +88,15 @@ function PersonnelSearch() {
         width: 180,
       },
       {
+        title: '会计科目结构',
+        dataIndex: 'accStructureCode',
+        width: 200,
+        render: (_, row) =>
+          row?.accStructureCode
+            ? `${row?.accStructureCode}/${row.accStructureDesc}`
+            : '',
+      },
+      {
         title: '接口表名称',
         dataIndex: 'tableName',
         width: 200,

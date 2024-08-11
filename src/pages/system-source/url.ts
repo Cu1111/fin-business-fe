@@ -10,12 +10,13 @@ const Url = {
   getSystemSourceCom: `${prefix}/base/getSystemSourceCom`,
   addSystemSourceCom: `${prefix}/base/addSystemSourceCom`,
   updateSystemSourceCom: `${prefix}/base/updateSystemSourceCom`,
+  getSSCom: `${prefix}/base/getSSCom`,
 
   // 字段映射
   getSystemSourceColumnMap: `${prefix}/base/getSystemSourceColumnMap`,
   addSystemSourceColumnMap: `${prefix}/base/addSystemSourceColumnMap`,
   updateSystemSourceColumnMap: `${prefix}/base/updateSystemSourceColumnMap`,
-  getDBColumn: `${prefix}/base/getDBColumn`
+  getDBColumn: `${prefix}/base/getDBColumn`,
 };
 
 export default Url;

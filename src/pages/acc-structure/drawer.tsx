@@ -35,8 +35,10 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
     try {
       await form.validate();
       const data = form.getFields();
+      const { segmentType } = data;
       const params = {
         ...data,
+        segmentType: segmentType.value,
       };
       console.log(data, params, 'data');
       const fetchUrl = row ? Url.updateAccStructure : Url.addAccStructure;
@@ -54,12 +56,16 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
 
   useEffect(() => {
     if (row) {
-      const { enabledFlag, ...other } = row;
-      console.log(row, 'row');
-      const data = { ...other, enabledFlag: enabledFlag === 'Y' };
-      console.log(data, 'data');
+      const { enabledFlag, segmentType, segmentTypeDesc, ...other } = row;
+      const data = {
+        ...other,
+        enabledFlag: enabledFlag === 'Y',
+      };
+      if (segmentType) {
+        data.segmentType = { value: segmentType, label: segmentTypeDesc };
+      }
 
-      form.setFieldsValue({ ...other, enabledFlag: enabledFlag === 'Y' });
+      form.setFieldsValue(data);
     }
   }, []);
 
@@ -101,6 +107,15 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         </Form.Item>
         <Form.Item label="段值描述" field="segmentDesc">
           <Input allowClear />
+        </Form.Item>
+        <Form.Item label="段值类型" field="segmentType">
+          <FormSelect
+            showSearch
+            onFetchData={DataFetch(Url.getSegmentType)}
+            renderLabel={(v) => `${v.value}/${v.label}`}
+            labelInValue
+            allowClear
+          />
         </Form.Item>
         <Form.Item
           label="数据字典类型"

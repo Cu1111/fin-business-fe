@@ -212,6 +212,7 @@ const MappingDrawer: React.FC<DrawerFormProps> = (props) => {
                   title: '成功',
                   content: res?.message || '操作成功',
                 });
+                fetchData();
               });
             } catch {
               Message.error('校验失败');

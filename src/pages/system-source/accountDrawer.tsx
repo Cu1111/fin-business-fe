@@ -228,8 +228,8 @@ const AccountDrawer: React.FC<DrawerFormProps> = (props) => {
             >
               <FormSelect
                 showSearch
-                onFetchData={DataFetch(Url.searchDictValues, {
-                  dictType: 'ACC_COM',
+                onFetchData={DataFetch(Url.getSSCom, {
+                  systemSourceId,
                 })}
                 renderLabel={(v) => `${v.value}/${v.label}`}
                 allowClear
