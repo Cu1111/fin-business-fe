@@ -64,16 +64,16 @@ function PersonnelSearch() {
         width: 200,
       },
       {
+        title: '数据字典',
+        dataIndex: 'dictType',
+        width: 200,
+      },
+      {
         title: '段值类型',
         dataIndex: 'segmentType',
         width: 200,
         render: (_, row) =>
           row.segmentType ? `${row.segmentType}/${row.segmentTypeDesc}` : '',
-      },
-      {
-        title: '数据字典',
-        dataIndex: 'dictType',
-        width: 200,
       },
       {
         title: '操作',

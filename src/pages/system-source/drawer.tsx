@@ -132,7 +132,7 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
           label="接口表名称"
           field="tableName"
           rules={[{ required: true }]}
-          disabled={!!row}
+          // disabled={!!row}
         >
           <Input />
         </Form.Item>

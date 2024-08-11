@@ -84,7 +84,7 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
     >
       <Form
         form={form}
-        labelAlign="left"
+        labelAlign="right"
         labelCol={{ span: 7 }}
         wrapperCol={{ span: 17 }}
       >
@@ -108,15 +108,6 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         <Form.Item label="段值描述" field="segmentDesc">
           <Input allowClear />
         </Form.Item>
-        <Form.Item label="段值类型" field="segmentType">
-          <FormSelect
-            showSearch
-            onFetchData={DataFetch(Url.getSegmentType)}
-            renderLabel={(v) => `${v.value}/${v.label}`}
-            labelInValue
-            allowClear
-          />
-        </Form.Item>
         <Form.Item
           label="数据字典类型"
           field="dictType"
@@ -126,6 +117,15 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
             showSearch
             onFetchData={DataFetch(Url.searchDictType)}
             renderLabel={(v) => `${v.value}/${v.label}`}
+            allowClear
+          />
+        </Form.Item>
+        <Form.Item label="段值类型" field="segmentType">
+          <FormSelect
+            showSearch
+            onFetchData={DataFetch(Url.getSegmentType)}
+            renderLabel={(v) => `${v.value}/${v.label}`}
+            labelInValue
             allowClear
           />
         </Form.Item>
