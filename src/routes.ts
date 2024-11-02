@@ -91,6 +91,14 @@ export const routes: IRoute[] = [
       },
     ],
   },
+  {
+    name: '业务接口表',
+    key: 'business-interface-table',
+  },
+  {
+    name: '业务转换分录',
+    key: 'business-change-table',
+  },
 ];
 
 export const getName = (path: string, routes) => {
