@@ -7,7 +7,11 @@ function GroupDescribe({ row }) {
   const [describe, setDescribe] = useState<string>('');
 
   const getGroupDescribe = useCallback(async (row) => {
-    const res = await $fetch(Url.getAccCombo, row.accConfig);
+    const params = row?.accConfig.map((v) => ({
+      ...v,
+      segmentValue: row[v.segment],
+    }));
+    const res = await $fetch(Url.getAccCombo, params);
     setDescribe(res.map((v) => v.segmentValueName).join('.'));
   }, []);
 
