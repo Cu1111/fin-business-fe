@@ -99,6 +99,28 @@ export const routes: IRoute[] = [
     name: '业务转换分录',
     key: 'business-change-table',
   },
+  {
+    name: '总账模块',
+    key: 'GL-module',
+    children: [
+      {
+        name: '日记账批',
+        key: 'GL-module/day-book-batch',
+      },
+      {
+        name: '日记账',
+        key: 'GL-module/day-book',
+      },
+      {
+        name: '期间',
+        key: 'GL-module/period',
+      },
+      {
+        name: '汇率',
+        key: 'GL-module/exchange-rate',
+      },
+    ],
+  },
 ];
 
 export const getName = (path: string, routes) => {
