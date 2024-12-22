@@ -132,7 +132,7 @@ function PersonnelSearch() {
         title: '操作',
         dataIndex: 'operation',
         fixed: 'right',
-        width: 300,
+        width: 100,
         render: (_, row) => (
           <div style={{ display: 'flex' }}>
             <Button

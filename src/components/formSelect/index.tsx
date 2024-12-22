@@ -31,7 +31,12 @@ const FormSelect = (props: FormSelectProps) => {
     if (renderLabel && labelInValue && mode !== 'multiple' && value) {
       return { ...(value as any), label: renderLabel(value) };
     }
-    console.log(value);
+    console.log('1321312', value);
+    if (labelInValue) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      return { ...value, value: value[keyValue] };
+    }
     return value;
   }, [value]);
 

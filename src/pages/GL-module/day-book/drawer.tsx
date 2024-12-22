@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
   Form,
   Input,
@@ -6,8 +6,10 @@ import {
   Drawer,
   Message,
   Notification,
+  InputNumber,
 } from '@arco-design/web-react';
 import FormSelect from '@/components/formSelect';
+import dayjs from 'dayjs';
 
 import { $fetch, DataFetch } from '@/utils';
 import Url from './url';
@@ -28,11 +30,33 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
   const [form] = useForm();
 
   const handleSubmit = async () => {
+    const data = form.getFields();
+    console.log(data);
     try {
       await form.validate();
       const data = form.getFields();
+      const {
+        jeBatchId,
+        accBookDictCode,
+        exchangeRateTime,
+        jeSourceDictCode,
+        jeCategoryDictCode,
+        exchangeRateTypeDictCode,
+      } = data;
       const fetchUrl = row ? Url.updateGlJeHeaders : Url.insertGlJeHeaders;
-      $fetch(fetchUrl, { ...data, accBookDictType: 'ACC_BOOK' }).then((res) => {
+      $fetch(fetchUrl, {
+        ...data,
+        jeBatchId: jeBatchId?.id,
+        accBookDictCode: accBookDictCode?.value,
+        jeSourceDictCode: jeSourceDictCode?.value,
+        exchangeRateTime: exchangeRateTime && dayjs(exchangeRateTime).valueOf(),
+        jeCategoryDictCode: jeCategoryDictCode?.value,
+        exchangeRateTypeDictCode: exchangeRateTypeDictCode?.value,
+        accBookDictType: 'ACC_BOOK',
+        exchangeRateTypeDictType: 'EXCHANGE_RATE_TYPE',
+        jeSourceDictType: 'JE_SOURCE',
+        jeCategoryDictType: 'JE_CATEGORY',
+      }).then((res) => {
         Notification.success({
           title: '成功',
           content: res?.message || '操作成功',
@@ -46,7 +70,34 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
 
   useEffect(() => {
     if (row) {
-      form.setFieldsValue(row);
+      console.log(row);
+      const {
+        accBookDesc,
+        accBookDictCode,
+        jeBatchId,
+        jeBatchName,
+        jeSourceDictCode,
+        jeSourceDesc,
+        jeCategoryDictCode,
+        jeCategoryDesc,
+        exchangeRateTypeDictCode,
+        ...others
+      } = row;
+
+      form.setFieldsValue({
+        accBookDictCode: { label: accBookDesc, value: accBookDictCode },
+        jeBatchId: { id: jeBatchId, label: jeBatchName },
+        jeSourceDictCode: { label: jeSourceDesc, value: jeSourceDictCode },
+        jeCategoryDictCode: {
+          label: jeCategoryDesc,
+          value: jeCategoryDictCode,
+        },
+        exchangeRateTypeDictCode: {
+          label: exchangeRateTypeDictCode,
+          value: exchangeRateTypeDictCode,
+        },
+        ...others,
+      });
     }
   }, []);
 
@@ -93,16 +144,98 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
             onFetchData={DataFetch(Url.searchDictValues, {
               dictType: 'ACC_BOOK',
             })}
+            labelInValue
+            renderLabel={(v) => `${v.value}/${v.label}`}
+            allowClear
+          />
+        </Form.Item>
+        <Form.Item label="日记账批名" field="jeBatchId">
+          <FormSelect
+            showSearch
+            onFetchData={DataFetch(Url.searchGlJeBatches)}
+            keyValue="id"
+            labelValue='label'
+            labelInValue
+            allowClear
+          />
+        </Form.Item>
+        <Form.Item
+          label="日记账名称"
+          field="jeHeaderName"
+          rules={[{ required: true, message: '必填' }]}
+        >
+          <Input allowClear placeholder="请输入" />
+        </Form.Item>
+        <Form.Item
+          label="日记账来源"
+          field="jeSourceDictCode"
+          rules={[{ required: true, message: '必填' }]}
+        >
+          <FormSelect
+            showSearch
+            onFetchData={DataFetch(Url.searchDictValues, {
+              dictType: 'JE_SOURCE',
+            })}
+            labelInValue
+            allowClear
+          />
+        </Form.Item>
+        <Form.Item
+          label="日记账类别"
+          field="jeCategoryDictCode"
+          rules={[{ required: true, message: '必填' }]}
+        >
+          <FormSelect
+            showSearch
+            onFetchData={DataFetch(Url.searchDictValues, {
+              dictType: 'JE_CATEGORY',
+            })}
+            labelInValue
+            allowClear
+          />
+        </Form.Item>
+        <Form.Item
+          label="币种"
+          field="currencyCode"
+          rules={[{ required: true, message: '必填' }]}
+        >
+          <FormSelect
+            showSearch
+            onFetchData={DataFetch(Url.searchDictValues, {
+              dictType: 'CURRENCY',
+            })}
             renderLabel={(v) => `${v.value}/${v.label}`}
             allowClear
           />
         </Form.Item>
         <Form.Item
-          label="日记账批名称"
-          field="jeBatchName"
+          label="汇率类型"
+          field="exchangeRateTypeDictCode"
           rules={[{ required: true, message: '必填' }]}
         >
-          <Input allowClear placeholder="请输入" />
+          <FormSelect
+            showSearch
+            onFetchData={DataFetch(Url.searchDictValues, {
+              dictType: 'EXCHANGE_RATE_TYPE',
+            })}
+            labelInValue
+            allowClear
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="汇率日期"
+          field="exchangeRateTime"
+          rules={[{ required: true, message: '必填' }]}
+        >
+          <DatePicker />
+        </Form.Item>
+        <Form.Item
+          label="汇率"
+          field="exchangeRate"
+          rules={[{ required: true, message: '必填' }]}
+        >
+          <InputNumber min={0} step={0.000001} precision={1} />
         </Form.Item>
       </Form>
     </Drawer>
