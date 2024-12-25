@@ -5,6 +5,7 @@ const Url = {
   addDictType: `${prefix}/base/addDictType`,
   updateDictType: `${prefix}/base/updateDictType`,
   searchDictType: `${prefix}/base/searchDictType`,
+  getExtColumnFieldList: `${prefix}/base/getExtColumnFieldList`,
 };
 
 export default Url;

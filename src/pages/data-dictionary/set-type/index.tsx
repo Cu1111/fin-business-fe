@@ -80,7 +80,7 @@ function PersonnelSearch() {
 
   useEffect(() => {
     fetchData();
-  }, [pagination.current, pagination.pageSize, JSON.stringify(formParams)]);
+  }, [pagination.current, pagination.pageSize,formParams]);
 
   function fetchData() {
     const { current, pageSize } = pagination;

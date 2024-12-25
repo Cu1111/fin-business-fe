@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Form,
   Input,
@@ -8,9 +8,13 @@ import {
   Switch,
   Message,
   Notification,
+  Button,
+  Typography,
 } from '@arco-design/web-react';
 import dayjs from 'dayjs';
 import FormSelect from '@/components/formSelect';
+import styles from './style/index.module.less';
+import EditableTable from './editTable';
 
 import { $fetch, DataFetch } from '@/utils';
 import Url from './url';
@@ -30,6 +34,7 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
   const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
 
   const [form] = useForm();
+  const extConfigTableRef = useRef();
 
   const handleSubmit = async () => {
     try {
@@ -67,7 +72,7 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
 
   return (
     <Drawer
-      width={400}
+      width={900}
       title={<span>{row ? '编辑' : '新增'}</span>}
       visible={visible}
       confirmLoading={confirmLoading}
@@ -78,11 +83,15 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
       maskClosable={false}
       unmountOnExit
     >
+      <div className={styles['dict-type-title']}>
+        <span>基本信息</span>
+      </div>
+
       <Form
         form={form}
         labelAlign="left"
-        labelCol={{ span: 7 }}
-        wrapperCol={{ span: 17 }}
+        labelCol={{ span: 4 }}
+        wrapperCol={{ span: 12 }}
       >
         <Form.Item
           label="类型Code"
@@ -106,6 +115,11 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
           <Switch />
         </Form.Item>
       </Form>
+      <div className={styles['dict-type-title']}>
+        <span>辅助字段</span>
+        <Button type="primary">新增</Button>
+      </div>
+      <EditableTable ref={extConfigTableRef} />
     </Drawer>
   );
 };
