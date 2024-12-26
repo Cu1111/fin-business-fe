@@ -13,6 +13,7 @@ import {
   Select,
   Form,
   FormInstance,
+  Switch,
 } from '@arco-design/web-react';
 
 import FormSelect from '@/components/formSelect';
@@ -23,13 +24,13 @@ const FormItem = Form.Item;
 const RowContext = React.createContext<{ getForm?: () => FormInstance }>({});
 
 function EditableRow(props) {
-  const { children, record, className, rowRefs, ...rest } = props;
+  const { children, record, className, rowRefs, setRowData, ...rest } = props;
   console.log(props, 'EditableRow', rest);
   const refForm = useRef(null);
 
   useEffect(() => {
     if (rowRefs && record.$$key) {
-      rowRefs.current[record.$$key] = refForm;
+      rowRefs.current[record.$$key] = refForm.current;
     }
   }, [record.$$key, rowRefs]);
 
@@ -48,6 +49,10 @@ function EditableRow(props) {
         ref={refForm}
         wrapper="tr"
         wrapperProps={rest}
+        onValuesChange={(v, rowData) => {
+          setRowData(record.$$key, v);
+          console.log(v, rowData, 'rowDAta');
+        }}
         className={`${className} editable-row`}
       />
     </RowContext.Provider>
@@ -61,16 +66,6 @@ function EditableCell(props) {
   const { renderEditor, renderView } = column;
   console.log(editable, 'editable', props, renderEditor);
 
-  // if (!renderEditor || !editable) {
-  //   return (
-  //     <div
-  //       className={column.editable ? `editable-cell ${className}` : className}
-  //     >
-  //       {renderView ? renderView(rowData[column.dataIndex], rowData) : children}
-  //     </div>
-  //   );
-  // }
-
   return (
     <FormItem
       style={{ marginBottom: 0 }}
@@ -79,6 +74,7 @@ function EditableCell(props) {
       initialValue={rowData[column.dataIndex]}
       field={column.dataIndex}
       rules={column.rules}
+      triggerPropName={column.triggerPropName || 'value'}
     >
       {(formData, form) => {
         if (!renderEditor || !editable) {
@@ -94,8 +90,8 @@ function EditableCell(props) {
             </div>
           );
         }
-        console.log('formData', formData, form, 'form', form.getFieldsValue());
-        return renderEditor(rowData[column.dataIndex], formData);
+
+        return renderEditor(rowData[column.dataIndex], rowData);
       }}
     </FormItem>
   );
@@ -105,28 +101,22 @@ const EditableTable = forwardRef((props, ref) => {
   let i = 0;
   const rowRefs = useRef({});
   const [editable, setEditable] = useState<boolean>(true);
-  const [data, setData] = useState<any>([
-    {
-      $$key: '1',
-      dictExtConfigId: '1',
-      extColumnFieldName: '其他',
-      extColumnField: 'attribute2',
-      extType: 'list',
-      extDictType: 'ACC_STRUCTURE',
-      enabledFlag: 'Y',
-    },
-  ]);
-  const columns = [
+  const [data, setData] = useState<Array<any>>([]);
+
+  useEffect(() => {
+    console.log(data, 'data');
+  }, [data]);
+
+  const columns: any = [
     {
       title: '拓展字段',
       dataIndex: 'extColumnField',
       editable: true,
       rules: [{ required: true }],
-      // render: (v, rowData) => {},
+      width: 200,
       renderEditor: () => {
         return (
           <FormSelect
-            style={{ width: 200 }}
             showSearch
             onFetchData={DataFetch(Url.getExtColumnFieldList)}
             allowClear
@@ -139,6 +129,7 @@ const EditableTable = forwardRef((props, ref) => {
       dataIndex: 'extColumnFieldName',
       rules: [{ required: true }],
       editable: true,
+      width: 200,
       renderEditor: () => {
         return <Input />;
       },
@@ -148,7 +139,8 @@ const EditableTable = forwardRef((props, ref) => {
       dataIndex: 'extType',
       rules: [{ required: true }],
       editable: true,
-      renderEditor: () => {
+      width: 120,
+      renderEditor: (v, { $$key }) => {
         return (
           <Select
             placeholder="请选择"
@@ -156,6 +148,16 @@ const EditableTable = forwardRef((props, ref) => {
               { label: 'list', value: 'list' },
               { label: 'input', value: 'input' },
             ]}
+            onChange={(v) => {
+              if (v === 'input') {
+                setRowData($$key, { extType: v, extDictType: null });
+              } else {
+                setRowData($$key, { extType: v });
+              }
+              // if (v !== 'list') {
+              //   setRowData($$key, { extDictType: null });
+              // }
+            }}
             allowClear
           />
         );
@@ -164,18 +166,44 @@ const EditableTable = forwardRef((props, ref) => {
     {
       title: '取值范围',
       dataIndex: 'extDictType',
-      rules: [{ required: true }],
+      // rules: [{ validator:(v) }],
+      width: 200,
       editable: true,
+      renderEditor: (v, { extType }) => {
+        return (
+          <FormSelect
+            showSearch
+            disabled={!extType || extType === 'input'}
+            onFetchData={DataFetch(Url.searchDictType)}
+            renderLabel={(v) => `${v.value}/${v.label}`}
+            allowClear
+          />
+        );
+      },
     },
     {
       title: '是否启用',
       dataIndex: 'enabledFlag',
-      rules: [{ required: true }],
+      rules: [{ required: true, message: '必填' }],
+      width: 120,
       editable: true,
+      triggerPropName: 'checked',
+      renderEditor: (v) => {
+        return (
+          <Switch
+            checked={v === 'Y'}
+            onChange={(v, { $$key }) => {
+              setRowData($$key, { enabledFlag: v ? 'Y' : 'N' });
+            }}
+          />
+        );
+      },
     },
     {
       title: '操作',
       dataIndex: 'operation',
+      width: 100,
+      fixed: 'right',
       render: (_, record) => (
         <Button
           onClick={() => {
@@ -205,6 +233,19 @@ const EditableTable = forwardRef((props, ref) => {
     rowRefs.current = newRowRefs;
   }
 
+  const setRowData = (key, changedData) => {
+    const index = data.findIndex((v) => v.$$key === key);
+    console.log('changedData', changedData);
+    if (index !== -1) {
+      const lineData = data[index];
+      const newLine = { ...lineData, ...changedData };
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const newRow = data.toSpliced(index, 1, newLine);
+      setData(newRow);
+    }
+  };
+
   const handleCellChange = (value, dataIndex, key) => {
     const newData = data.map((item) => {
       if (item.$$key === key) {
@@ -215,6 +256,13 @@ const EditableTable = forwardRef((props, ref) => {
     setData(newData);
   };
 
+  const validateAll = () => {
+    Object.values(rowRefs.current).forEach((formRef: any) => {
+      console.log(formRef, 'formRefformRef');
+      formRef.validate();
+    });
+  };
+
   useImperativeHandle(ref, () => ({
     addRow,
     setData: (tableData) => {
@@ -222,36 +270,83 @@ const EditableTable = forwardRef((props, ref) => {
       setData(newData);
     },
     getData: () => data,
-    // validateAll: () => {},
+    validateAll,
     setEditable: (v) => {
       setEditable(v);
     },
   }));
 
   return (
-    <Table
-      data={data}
-      rowKey="dictExtConfigId"
-      components={{
-        body: {
-          row: (props) => <EditableRow {...props} rowRefs={rowRefs} />,
-          cell: (props) => (
-            <EditableCell {...props} onCellChange={handleCellChange} />
-          ),
-        },
-      }}
-      columns={columns.map((column) =>
-        column.editable
-          ? {
-              ...column,
-              onCell: () => ({
-                editable,
-              }),
-            }
-          : column
-      )}
-      className="table-demo-editable-cell"
-    />
+    <>
+      <Button
+        onClick={() => {
+          setData([
+            {
+              $$key: '1',
+              dictExtConfigId: '1',
+              extColumnFieldName: '其他',
+              extColumnField: 'attribute2',
+              extType: 'list',
+              extDictType: 'ACC_STRUCTURE',
+              enabledFlag: 'Y',
+            },
+          ]);
+        }}
+      >
+        123
+      </Button>
+      <Button
+        onClick={() => {
+          validateAll();
+        }}
+      >
+        123
+      </Button>
+      <Button
+        onClick={() => {
+          addRow({ enabledFlag: 'Y' });
+        }}
+      >
+        123
+      </Button>
+      <Button
+        onClick={() => {
+          console.log(data, 'data');
+        }}
+      >
+        123
+      </Button>
+      <Table
+        data={data}
+        rowKey="dictExtConfigId"
+        components={{
+          body: {
+            row: (props) => (
+              <EditableRow
+                {...props}
+                rowRefs={rowRefs}
+                setRowData={setRowData}
+              />
+            ),
+            cell: (props) => (
+              <EditableCell {...props} onCellChange={handleCellChange} />
+            ),
+          },
+        }}
+        scroll={{ x: true, y: true }}
+        columns={columns.map((column) =>
+          column.editable
+            ? {
+                ...column,
+                onCell: () => ({
+                  editable,
+                }),
+              }
+            : column
+        )}
+        className="table-demo-editable-cell"
+      />
+    </>
   );
 });
 
