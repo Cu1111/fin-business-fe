@@ -41,10 +41,12 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
       await form.validate();
       await extConfigTableRef.current?.validateAll();
       const data = form.getFields();
+      const dictExtConfigs = extConfigTableRef.current?.getData();
       const { enabledFlag } = data;
       const params = {
         ...data,
         enabledFlag: enabledFlag === true ? 'Y' : 'N',
+        dictExtConfigs,
       };
       console.log(data, params, 'data');
       const fetchUrl = row ? Url.updateDictType : Url.addDictType;

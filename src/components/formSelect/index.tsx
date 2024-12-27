@@ -35,7 +35,7 @@ const FormSelect = (props: FormSelectProps) => {
     if (labelInValue) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      return { ...value, value: value[keyValue] };
+      return { ...value, value: value?.[keyValue] };
     }
     return value;
   }, [value]);

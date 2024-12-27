@@ -92,7 +92,11 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         labelCol={{ span: 7 }}
         wrapperCol={{ span: 17 }}
       >
-        <Form.Item label="类型" field="dictType" rules={[{ required: true }]}>
+        <Form.Item
+          label="类型"
+          field="dictType"
+          rules={[{ required: true, message: '必填' }]}
+        >
           <FormSelect
             showSearch
             labelInValue
@@ -105,14 +109,14 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         <Form.Item
           label="选项Code"
           field="dictCode"
-          rules={[{ required: true }]}
+          rules={[{ required: true, message: '必填' }]}
         >
           <Input allowClear />
         </Form.Item>
         <Form.Item
           label="选项描述"
           field="dictName"
-          rules={[{ required: true }]}
+          rules={[{ required: true, message: '必填' }]}
         >
           <Input allowClear />
         </Form.Item>

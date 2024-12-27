@@ -285,44 +285,6 @@ const EditableTable = forwardRef((props, ref) => {
 
   return (
     <>
-      <Button
-        onClick={() => {
-          setData([
-            {
-              $$key: '1',
-              dictExtConfigId: '1',
-              extColumnFieldName: '其他',
-              extColumnField: 'attribute2',
-              extType: 'list',
-              extDictType: 'ACC_STRUCTURE',
-              enabledFlag: 'Y',
-            },
-          ]);
-        }}
-      >
-        123
-      </Button>
-      <Button
-        onClick={() => {
-          validateAll();
-        }}
-      >
-        123
-      </Button>
-      <Button
-        onClick={() => {
-          addRow({ enabledFlag: 'Y' });
-        }}
-      >
-        123
-      </Button>
-      <Button
-        onClick={() => {
-          console.log(data, 'data');
-        }}
-      >
-        123
-      </Button>
       <Table
         data={data}
         rowKey="dictExtConfigId"

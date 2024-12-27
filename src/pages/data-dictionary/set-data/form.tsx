@@ -18,9 +18,12 @@ function SearchForm(props: {
 
   const [form] = useForm();
 
-  const handleSubmit = () => {
-    const values = form.getFieldsValue();
-    props.onSearch(values);
+  const handleSubmit = async () => {
+    try {
+      await form.validate();
+      const values = form.getFieldsValue();
+      props.onSearch(values);
+    } catch {}
   };
 
   const handleReset = () => {
@@ -41,7 +44,11 @@ function SearchForm(props: {
       >
         <Row gutter={24}>
           <Col span={colSpan}>
-            <Form.Item label="类型" field="dictType">
+            <Form.Item
+              label="类型"
+              field="dictType"
+              rules={[{ required: true, message: '必填' }]}
+            >
               <FormSelect
                 showSearch
                 onFetchData={DataFetch(Url.searchDictType)}

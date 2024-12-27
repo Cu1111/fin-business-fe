@@ -28,8 +28,8 @@ function PersonnelSearch() {
     current: 1,
     pageSizeChangeResetCurrent: true,
   });
-  const [loading, setLoading] = useState(true);
-  const [formParams, setFormParams] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [formParams, setFormParams] = useState(null);
   const [visible, setVisible] = useState<boolean>(false);
 
   const rowRef = useRef(null);
@@ -97,7 +97,9 @@ function PersonnelSearch() {
   );
 
   useEffect(() => {
-    fetchData();
+    if (formParams) {
+      fetchData();
+    }
   }, [pagination.current, pagination.pageSize, formParams]);
 
   function fetchData() {
