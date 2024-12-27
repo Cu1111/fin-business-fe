@@ -34,14 +34,14 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
   const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
 
   const [form] = useForm();
-  const extConfigTableRef = useRef();
+  const extConfigTableRef = useRef<any>();
 
   const handleSubmit = async () => {
     try {
       await form.validate();
+      await extConfigTableRef.current?.validateAll();
       const data = form.getFields();
       const { enabledFlag } = data;
-      console.log(enabledFlag, 'enabledFlag');
       const params = {
         ...data,
         enabledFlag: enabledFlag === true ? 'Y' : 'N',
@@ -61,10 +61,12 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
   };
 
   useEffect(() => {
-    console.log('rowwwww', row);
     if (row) {
-      const { enabledFlag, ...other } = row;
+      const { enabledFlag, dictExtConfigs, ...other } = row;
       form.setFieldsValue({ ...other, enabledFlag: enabledFlag === 'Y' });
+      setTimeout(() => {
+        extConfigTableRef.current.setData(dictExtConfigs);
+      }, 0);
     } else {
       form.setFieldsValue(null);
     }
@@ -117,7 +119,14 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
       </Form>
       <div className={styles['dict-type-title']}>
         <span>辅助字段</span>
-        <Button type="primary">新增</Button>
+        <Button
+          type="primary"
+          onClick={() => {
+            extConfigTableRef.current?.addRow({ enabledFlag: 'Y' });
+          }}
+        >
+          新增
+        </Button>
       </div>
       <EditableTable ref={extConfigTableRef} />
     </Drawer>

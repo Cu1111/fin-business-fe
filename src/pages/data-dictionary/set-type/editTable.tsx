@@ -98,7 +98,7 @@ function EditableCell(props) {
 }
 
 const EditableTable = forwardRef((props, ref) => {
-  let i = 0;
+  const indexRef = useRef(0);
   const rowRefs = useRef({});
   const [editable, setEditable] = useState<boolean>(true);
   const [data, setData] = useState<Array<any>>([]);
@@ -112,7 +112,7 @@ const EditableTable = forwardRef((props, ref) => {
       title: '拓展字段',
       dataIndex: 'extColumnField',
       editable: true,
-      rules: [{ required: true }],
+      rules: [{ required: true, message: '必填' }],
       width: 200,
       renderEditor: () => {
         return (
@@ -127,7 +127,7 @@ const EditableTable = forwardRef((props, ref) => {
     {
       title: '字段名',
       dataIndex: 'extColumnFieldName',
-      rules: [{ required: true }],
+      rules: [{ required: true, message: '必填' }],
       editable: true,
       width: 200,
       renderEditor: () => {
@@ -137,7 +137,7 @@ const EditableTable = forwardRef((props, ref) => {
     {
       title: '字段类型',
       dataIndex: 'extType',
-      rules: [{ required: true }],
+      rules: [{ required: true, message: '必填' }],
       editable: true,
       width: 120,
       renderEditor: (v, { $$key }) => {
@@ -207,6 +207,7 @@ const EditableTable = forwardRef((props, ref) => {
       render: (_, record) => (
         <Button
           onClick={() => {
+            console.log('record.$$key', record.$$key);
             deleteRow(record.$$key);
           }}
         >
@@ -219,7 +220,7 @@ const EditableTable = forwardRef((props, ref) => {
   function addRow(newRowData) {
     const allData = data.concat({
       ...newRowData,
-      $$key: `key_${i++}`,
+      $$key: `key_${indexRef.current++}`,
     });
     setData(allData);
   }
@@ -257,16 +258,22 @@ const EditableTable = forwardRef((props, ref) => {
   };
 
   const validateAll = () => {
-    Object.values(rowRefs.current).forEach((formRef: any) => {
-      console.log(formRef, 'formRefformRef');
-      formRef.validate();
-    });
+    return Promise.all(
+      Object.values(rowRefs.current).map((formRef: any) => {
+        console.log(formRef, 'formRefformRef');
+        return formRef.validate();
+      })
+    );
   };
 
   useImperativeHandle(ref, () => ({
     addRow,
     setData: (tableData) => {
-      const newData = tableData.map((v) => ({ ...v, $$key: `key_${i++}` }));
+      const newData = tableData.map((v) => ({
+        ...v,
+        $$key: `key_${indexRef.current++}`,
+      }));
+      console.log(indexRef.current, 'iiiiiii');
       setData(newData);
     },
     getData: () => data,
