@@ -110,6 +110,16 @@ export const routes: IRoute[] = [
       {
         name: '日记账',
         key: 'GL-module/day-book',
+        filePath: 'GL-module/day-book',
+        exact: true,
+        children: [
+          {
+            name: '日记账行',
+            key: 'GL-module/day-book-line',
+            path: 'GL-module/day-book-line/:jeHeaderId',
+            ignore: true,
+          },
+        ],
       },
       {
         name: '期间',

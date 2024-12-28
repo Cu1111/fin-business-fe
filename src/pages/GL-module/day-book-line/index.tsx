@@ -10,10 +10,15 @@ import {
   Typography,
   Switch,
 } from '@arco-design/web-react';
-import { IconDownload, IconPlus } from '@arco-design/web-react/icon';
+import {
+  IconDownload,
+  IconRight,
+  IconDown,
+  IconPlus,
+} from '@arco-design/web-react/icon';
 import { $fetch } from '@/utils';
-import { useHistory } from 'react-router-dom';
-
+import { useParams, useHistory } from 'react-router-dom';
+import GroupDescribe from './groupDescribe';
 import dayjs from 'dayjs';
 import SearchForm from './form';
 import DrawerForm from './drawer';
@@ -36,8 +41,10 @@ function PersonnelSearch() {
   const [loading, setLoading] = useState(true);
   const [formParams, setFormParams] = useState({});
   const [visible, setVisible] = useState<boolean>(false); // 新增修改弹窗的显示
-  const [accountShow, setAccountShow] = useState<boolean>(false); // 核算主体弹窗的显示
-  const [mappingShow, setMappingShow] = useState<boolean>(false); // 核算主体弹窗的显示
+  const [accStructure, setAccStructure] = useState();
+  const [headerConfig, setHeaderConfig] = useState();
+
+  const { jeHeaderId } = useParams();
 
   const rowRef = useRef(null);
 
@@ -55,65 +62,64 @@ function PersonnelSearch() {
     });
   };
 
-  const showDetail = (row) => {
-    const { jeHeaderId } = row;
-    history.push(
-      `/GL-module/day-book-line/${jeHeaderId}?accBookDictCode=${row.accBookDictCode}`
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const accBookDictCode = params.get('accBookDictCode');
+    console.log('params', accBookDictCode);
+    $fetch(Url.getJeHeadersAndAccStructureByJeHeaderId, { jeHeaderId }).then(
+      (res) => {
+        const { accStructureResponseList, glJeHeadersResponse } = res;
+        setAccStructure(accStructureResponseList);
+        setHeaderConfig(glJeHeadersResponse);
+      }
     );
-  };
+  }, []);
 
   const columns = useMemo<Array<TableColumnProps>>(
     () => [
       {
-        title: '期间',
-        dataIndex: 'periodName',
+        title: '行号',
+        dataIndex: 'jeLineNumber',
         fixed: 'left',
-        width: 120,
+        width: 80,
       },
       {
-        title: '账套',
+        title: '账户组合',
         dataIndex: 'accBookDesc',
+        ellipsis: true,
+        render: (_, row) => {
+          const segmentList = (accStructure || []).map((v) => {
+            const { segment } = v;
+            return row[segment];
+          });
+          return segmentList.join('.');
+        },
+        width: 300,
+      },
+      {
+        title: '日记账行描述',
+        dataIndex: 'lineDesc',
+        ellipsis: true,
+        width: 200,
+      },
+      {
+        title: '输入借方金额',
+        dataIndex: 'enterDr',
         width: 120,
       },
       {
-        title: '日记账批名',
-        dataIndex: 'jeBatchName',
-        width: 200,
-      },
-      {
-        title: '日记账名称',
-        dataIndex: 'jeHeaderName',
-        width: 200,
-      },
-      {
-        title: '日记账来源',
-        dataIndex: 'jeSourceDesc',
-        width: 200,
-      },
-      {
-        title: '日记账类别',
-        dataIndex: 'jeCategoryDesc',
-        width: 200,
-      },
-      {
-        title: '币种',
-        dataIndex: 'currencyCode',
+        title: '输入贷方金额',
+        dataIndex: 'enterCr',
         width: 120,
       },
       {
-        title: '汇率类型',
-        dataIndex: 'exchangeRateTypeDictCode',
+        title: '记账借方金额',
+        dataIndex: 'accountDr',
         width: 120,
       },
       {
-        title: '汇率日期',
-        dataIndex: 'exchangeRateTime',
-        render: (v) => (v ? dayjs(v).format('YYYY-MM-DD') : ''),
-        width: 180,
-      },
-      {
-        title: '汇率',
-        dataIndex: 'exchangeRate',
+        title: '记账贷方金额',
+        dataIndex: 'accountCr',
         width: 120,
       },
       {
@@ -142,7 +148,7 @@ function PersonnelSearch() {
         title: '操作',
         dataIndex: 'operation',
         fixed: 'right',
-        width: 180,
+        width: 100,
         render: (_, row) => (
           <div style={{ display: 'flex' }}>
             <Button
@@ -152,14 +158,6 @@ function PersonnelSearch() {
               onClick={() => handleEdit(row)}
             >
               编辑
-            </Button>
-            <Button
-              type="primary"
-              style={{ marginRight: '6px' }}
-              size="small"
-              onClick={() => showDetail(row)}
-            >
-              日记账行
             </Button>
           </div>
         ),
@@ -175,11 +173,12 @@ function PersonnelSearch() {
   function fetchData() {
     const { current, pageSize } = pagination;
     setLoading(true);
-    $fetch(Url.getGlJeHeaders, {
+    $fetch(Url.getGlJeLines, {
       page: {
         pageNo: current,
         pageSize,
       },
+      jeHeaderId,
       ...formParams,
     })
       .then((res) => {
@@ -205,8 +204,6 @@ function PersonnelSearch() {
 
   const handleClose = (refresh?: boolean) => {
     setVisible(false);
-    setAccountShow(false);
-    setMappingShow(false);
 
     if (refresh) {
       fetchData();
@@ -228,7 +225,7 @@ function PersonnelSearch() {
 
   return (
     <Card>
-      <SearchForm onSearch={handleSearch} />
+      <SearchForm onSearch={handleSearch} accStructure={accStructure} />
 
       <div className={styles['button-group']}>
         <Space>
@@ -247,13 +244,43 @@ function PersonnelSearch() {
         rowKey="dictValueId"
         loading={loading}
         onChange={onChangeTable}
+        expandedRowRender={(row) => {
+          return (
+            <div>
+              <span>组合描述：</span>
+              <GroupDescribe row={row} accStructure={accStructure} />
+            </div>
+          );
+        }}
+        expandProps={{
+          icon: ({ expanded, record, ...restProps }) =>
+            expanded ? (
+              <button {...restProps}>
+                <IconDown />
+              </button>
+            ) : (
+              <button {...restProps}>
+                <IconRight />
+              </button>
+            ),
+          // expandRowByClick: true,
+          width: 60,
+          columnTitle: '',
+        }}
         pagination={pagination}
         columns={columns}
         scroll={{ x: true, y: true }}
         data={data}
       />
       {visible && (
-        <DrawerForm visible row={rowRef.current} handleClose={handleClose} />
+        <DrawerForm
+          visible
+          row={rowRef.current}
+          accStructure={accStructure}
+          handleClose={handleClose}
+          jeHeaderId={jeHeaderId}
+          headerConfig={headerConfig}
+        />
       )}
     </Card>
   );
