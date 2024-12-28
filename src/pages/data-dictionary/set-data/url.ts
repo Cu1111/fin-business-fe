@@ -6,6 +6,7 @@ const Url = {
   updateDictValues: `${prefix}/base/updateDictValues`,
   searchDictType: `${prefix}/base/searchDictType`,
   getDictType: `${prefix}/base/getDictType`,
+  searchDictValues: `${prefix}/base/searchDictValues`,
 };
 
 export default Url;

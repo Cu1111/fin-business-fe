@@ -42,6 +42,7 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
       await extConfigTableRef.current?.validateAll();
       const data = form.getFields();
       const dictExtConfigs = extConfigTableRef.current?.getData();
+      console.log(dictExtConfigs, 'dictExtConfigs');
       const { enabledFlag } = data;
       const params = {
         ...data,

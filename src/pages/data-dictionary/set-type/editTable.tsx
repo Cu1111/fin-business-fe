@@ -49,10 +49,9 @@ function EditableRow(props) {
         ref={refForm}
         wrapper="tr"
         wrapperProps={rest}
-        onValuesChange={(v, rowData) => {
-          setRowData(record.$$key, v);
-          console.log(v, rowData, 'rowDAta');
-        }}
+        // onValuesChange={(v, rowData) => {
+        //   console.log(v, rowData, 'rowDAta');
+        // }}
         className={`${className} editable-row`}
       />
     </RowContext.Provider>
@@ -60,11 +59,9 @@ function EditableRow(props) {
 }
 
 function EditableCell(props) {
-  console.log(props, 'cell props');
   const { children, className, rowData, column, editable } = props;
   const { getForm } = useContext(RowContext);
   const { renderEditor, renderView } = column;
-  console.log(editable, 'editable', props, renderEditor);
 
   return (
     <FormItem
@@ -114,11 +111,14 @@ const EditableTable = forwardRef((props, ref) => {
       editable: true,
       rules: [{ required: true, message: '必填' }],
       width: 200,
-      renderEditor: () => {
+      renderEditor: (v, { $$key }) => {
         return (
           <FormSelect
             showSearch
             onFetchData={DataFetch(Url.getExtColumnFieldList)}
+            onChange={(v) => {
+              setRowData($$key, { extColumnField: v });
+            }}
             allowClear
           />
         );
@@ -130,8 +130,17 @@ const EditableTable = forwardRef((props, ref) => {
       rules: [{ required: true, message: '必填' }],
       editable: true,
       width: 200,
-      renderEditor: () => {
-        return <Input />;
+      renderEditor: (v, { $$key }) => {
+        return (
+          <Input
+            onBlur={(e) => {
+              setRowData($$key, { extColumnFieldName: e?.target?.value });
+            }}
+            onPressEnter={(e) => {
+              setRowData($$key, { extColumnFieldName: e?.target?.value });
+            }}
+          />
+        );
       },
     },
     {
@@ -169,13 +178,16 @@ const EditableTable = forwardRef((props, ref) => {
       // rules: [{ validator:(v) }],
       width: 200,
       editable: true,
-      renderEditor: (v, { extType }) => {
+      renderEditor: (v, { extType, $$key }) => {
         return (
           <FormSelect
             showSearch
             disabled={!extType || extType === 'input'}
             onFetchData={DataFetch(Url.searchDictType)}
             renderLabel={(v) => `${v.value}/${v.label}`}
+            onChange={(v) => {
+              setRowData($$key, { extDictType: v });
+            }}
             allowClear
           />
         );
@@ -209,6 +221,7 @@ const EditableTable = forwardRef((props, ref) => {
           onClick={() => {
             console.log('record.$$key', record.$$key);
             deleteRow(record.$$key);
+            // console.log(data, 'data');
           }}
         >
           删除

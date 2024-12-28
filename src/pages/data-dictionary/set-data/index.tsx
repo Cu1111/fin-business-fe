@@ -31,7 +31,7 @@ function PersonnelSearch() {
   const [loading, setLoading] = useState(false);
   const [formParams, setFormParams] = useState(null);
   const [visible, setVisible] = useState<boolean>(false);
-
+  const [dictExtConfig, setDictExtConfig] = useState([]);
   const rowRef = useRef(null);
 
   const handleEdit = (row) => {
@@ -48,7 +48,7 @@ function PersonnelSearch() {
     });
   };
 
-  const columns = useMemo(
+  const columns: any = useMemo(
     () => [
       {
         title: '类型Code',
@@ -58,6 +58,7 @@ function PersonnelSearch() {
       {
         title: '类型描述',
         dataIndex: 'dictDesc',
+        width: 200,
       },
       {
         title: '选项Code',
@@ -67,25 +68,50 @@ function PersonnelSearch() {
       {
         title: '选项描述',
         dataIndex: 'dictName',
+        width: 200,
       },
       {
         title: '是否启用',
         dataIndex: 'enabledFlag',
         render: (v) => <Switch checked={v === 'Y'} />,
+        width: 120,
       },
-      {
-        title: '开始时间',
-        dataIndex: 'startTime',
-        render: (v) => (v ? dayjs(v).format('YYYY-MM-DD') : ''),
-      },
-      {
-        title: '结束时间',
-        dataIndex: 'endTime',
-        render: (v) => (v ? dayjs(v).format('YYYY-MM-DD') : ''),
-      },
+      ...dictExtConfig.map((v) => {
+        const { extColumnFieldName, extColumnField, extType } = v;
+        return {
+          title: v.extColumnFieldName,
+          dataIndex: v.extColumnField,
+          render: (_, row) => {
+            const { attributeData, attributeValue } = row?.attributeData.find(
+              (att) => att.attribute === extColumnField
+            );
+            if (extType === 'input') {
+              return attributeValue || '';
+            }
+            if (extType === 'list' && attributeData) {
+              const { dictCode, dictName } = attributeData?.[0] || {};
+              return dictCode && dictName ? `${dictCode}/${dictName}` : '';
+            }
+            return '';
+          },
+          width: 200,
+        };
+      }),
+      // {
+      //   title: '开始时间',
+      //   dataIndex: 'startTime',
+      //   render: (v) => (v ? dayjs(v).format('YYYY-MM-DD') : ''),
+      // },
+      // {
+      //   title: '结束时间',
+      //   dataIndex: 'endTime',
+      //   render: (v) => (v ? dayjs(v).format('YYYY-MM-DD') : ''),
+      // },
       {
         title: '操作',
         dataIndex: 'operation',
+        width: 100,
+        fixed: 'right',
         render: (_, row) => (
           <Button type="primary" size="small" onClick={() => handleEdit(row)}>
             编辑
@@ -93,7 +119,7 @@ function PersonnelSearch() {
         ),
       },
     ],
-    []
+    [dictExtConfig]
   );
 
   useEffect(() => {
@@ -113,7 +139,7 @@ function PersonnelSearch() {
       ...formParams,
     })
       .then((res) => {
-        const { page, pageList } = res;
+        const { page, pageList, dictExtConfig } = res;
         setPatination({
           ...pagination,
           current: page?.pageNo,
@@ -121,6 +147,7 @@ function PersonnelSearch() {
           total: page?.totalCount,
         });
         setData(pageList);
+        setDictExtConfig(dictExtConfig);
       })
       .finally(() => {
         setLoading(false);
@@ -160,7 +187,12 @@ function PersonnelSearch() {
 
       <div className={styles['button-group']}>
         <Space>
-          <Button type="primary" icon={<IconPlus />} onClick={handleAdd}>
+          <Button
+            type="primary"
+            icon={<IconPlus />}
+            disabled={!formParams?.dictType}
+            onClick={handleAdd}
+          >
             新增
           </Button>
           <Button onClick={handleNoSupport}>批量导入</Button>
@@ -174,13 +206,19 @@ function PersonnelSearch() {
       <Table
         rowKey="dictValueId"
         loading={loading}
+        scroll={{ x: true, y: true }}
         onChange={onChangeTable}
         pagination={pagination}
         columns={columns}
         data={data}
       />
       {visible && (
-        <DrawerForm visible row={rowRef.current} handleClose={handleClose} />
+        <DrawerForm
+          visible
+          row={rowRef.current}
+          handleClose={handleClose}
+          dictExtConfig={dictExtConfig}
+        />
       )}
     </Card>
   );

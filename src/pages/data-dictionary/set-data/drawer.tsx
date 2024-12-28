@@ -18,6 +18,7 @@ import Url from './url';
 interface DrawerFormProps {
   visible: boolean;
   handleClose: (refresh?: boolean) => void;
+  dictExtConfig: Array<any>;
   row: any;
 }
 
@@ -26,7 +27,7 @@ const { useForm } = Form;
 const DatePicker: any = dp;
 
 const DrawerForm: React.FC<DrawerFormProps> = (props) => {
-  const { visible, handleClose, row } = props;
+  const { visible, handleClose, row, dictExtConfig } = props;
   const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
 
   const [form] = useForm();
@@ -37,8 +38,19 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
       const data = form.getFields();
       const { startTime, endTime, enabledFlag, dictType } = data;
       const { id: dictTypeId, value } = dictType;
+      const attributeValue = dictExtConfig.reduce((acc, config) => {
+        const { extColumnField, extType } = config;
+        if (extType === 'input') {
+          acc[extColumnField] = data[extColumnField];
+        }
+        if (extType === 'list') {
+          acc[extColumnField] = data[extColumnField]?.value;
+        }
+        return acc;
+      }, {});
       const params = {
         ...data,
+        ...attributeValue,
         dictTypeId,
         dictType: value,
         startTime: startTime && dayjs(startTime).valueOf(),
@@ -54,17 +66,45 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         });
         handleClose(true);
       });
-    } catch {
+    } catch (err) {
+      console.log(err);
       Message.error('校验失败');
     }
   };
 
   useEffect(() => {
     if (row) {
-      const { enabledFlag, dictType, dictTypeId, dictDesc, ...other } = row;
-      console.log(row, 'row');
+      const {
+        enabledFlag,
+        dictType,
+        dictTypeId,
+        dictDesc,
+        attributeData,
+        ...other
+      } = row;
+      const attributes = (attributeData || []).reduce(
+        (acc, { attribute, attributeData, attributeValue }) => {
+          const type = dictExtConfig.find(
+            (v) => v.extColumnField === attribute
+          ).extType;
+          if (type === 'input') {
+            acc[attribute] = attributeValue;
+          }
+          if (type === 'list') {
+            if (attributeData?.[0]) {
+              const { dictCode, dictName } = attributeData?.[0];
+              acc[attribute] = { value: dictCode, label: dictName };
+            } else {
+              acc[attribute] = null;
+            }
+          }
+          return acc;
+        },
+        {}
+      );
       const data = {
         ...other,
+        ...attributes,
         dictType: { value: dictType, label: dictDesc, id: dictTypeId },
         enabledFlag: enabledFlag === 'Y',
       };
@@ -72,6 +112,26 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
       form.setFieldsValue(data);
     }
   }, []);
+
+  const getContent = (type, extDictType) => {
+    if (type === 'input') {
+      return <Input allowClear />;
+    }
+    if (type === 'list' && extDictType) {
+      return (
+        <FormSelect
+          showSearch
+          onFetchData={DataFetch(Url.searchDictValues, {
+            dictType: extDictType,
+          })}
+          labelInValue
+          renderLabel={(v) => `${v.value}/${v.label}`}
+          allowClear
+        />
+      );
+    }
+    return <></>;
+  };
 
   return (
     <Drawer
@@ -127,12 +187,33 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         >
           <Switch />
         </Form.Item>
-        <Form.Item label="开始时间" field="startTime">
+        {dictExtConfig.reduce((acc, config) => {
+          const {
+            enabledFlag,
+            extColumnField,
+            extColumnFieldName,
+            extDictType,
+            extType,
+          } = config;
+          if (enabledFlag === 'Y') {
+            acc.push(
+              <Form.Item
+                key={extColumnField}
+                label={extColumnFieldName}
+                field={extColumnField}
+              >
+                {getContent(extType, extDictType)}
+              </Form.Item>
+            );
+          }
+          return acc;
+        }, [])}
+        {/* <Form.Item label="开始时间" field="startTime">
           <DatePicker />
         </Form.Item>
         <Form.Item label="结束时间" field="endTime">
           <DatePicker />
-        </Form.Item>
+        </Form.Item> */}
       </Form>
     </Drawer>
   );
