@@ -78,7 +78,6 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
 
   useEffect(() => {
     if (row) {
-      console.log(row);
       const {
         accBookDesc,
         accBookDictCode,
@@ -92,19 +91,39 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         ...others
       } = row;
 
-      form.setFieldsValue({
-        accBookDictCode: { label: accBookDesc, value: accBookDictCode },
-        jeBatchId: { id: jeBatchId, label: jeBatchName },
-        jeSourceDictCode: { label: jeSourceDesc, value: jeSourceDictCode },
-        jeCategoryDictCode: {
-          label: jeCategoryDesc,
-          value: jeCategoryDictCode,
-        },
-        exchangeRateTypeDictCode: {
-          label: exchangeRateTypeDictCode,
-          value: exchangeRateTypeDictCode,
-        },
-        ...others,
+      $fetch(Url.searchDictValues, {
+        dictType: 'ACC_BOOK',
+        dictCode: accBookDictCode,
+      }).then((res) => {
+        if (res.length) {
+          console.log(
+            res[0]?.attributeData,
+            res[0]?.attributeData.find((v) => v.attribute === 'attribute2'),
+            ' res[0]?.attributeData'
+          );
+          dCurrencyCode.current = res[0]?.attributeData.find(
+            (v) => v.attribute === 'attribute2'
+          )?.attributeData?.[0].dictCode;
+        } else {
+          Notification.error({
+            title: '失败',
+            content: '账套未配置币种',
+          });
+        }
+        form.setFieldsValue({
+          accBookDictCode: { label: accBookDesc, value: accBookDictCode },
+          jeBatchId: { id: jeBatchId, label: jeBatchName },
+          jeSourceDictCode: { label: jeSourceDesc, value: jeSourceDictCode },
+          jeCategoryDictCode: {
+            label: jeCategoryDesc,
+            value: jeCategoryDictCode,
+          },
+          exchangeRateTypeDictCode: {
+            label: exchangeRateTypeDictCode,
+            value: exchangeRateTypeDictCode,
+          },
+          ...others,
+        });
       });
     }
   }, [form, row]);
