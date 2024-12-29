@@ -57,9 +57,7 @@ function PersonnelSearch() {
 
   const showDetail = (row) => {
     const { jeHeaderId } = row;
-    history.push(
-      `/GL-module/day-book-line/${jeHeaderId}?accBookDictCode=${row.accBookDictCode}`
-    );
+    history.push(`/GL-module/day-book-line/${jeHeaderId}`);
   };
 
   const columns = useMemo<Array<TableColumnProps>>(

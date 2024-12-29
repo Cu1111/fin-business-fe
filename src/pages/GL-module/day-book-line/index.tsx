@@ -8,7 +8,7 @@ import {
   Notification,
   Space,
   Typography,
-  Switch,
+  Tooltip,
 } from '@arco-design/web-react';
 import {
   IconDownload,
@@ -41,7 +41,7 @@ function PersonnelSearch() {
   const [loading, setLoading] = useState(true);
   const [formParams, setFormParams] = useState({});
   const [visible, setVisible] = useState<boolean>(false); // 新增修改弹窗的显示
-  const [accStructure, setAccStructure] = useState();
+  const [accStructure, setAccStructure] = useState(null);
   const [headerConfig, setHeaderConfig] = useState();
 
   const { jeHeaderId } = useParams();
@@ -92,7 +92,16 @@ function PersonnelSearch() {
             const { segment } = v;
             return row[segment];
           });
-          return segmentList.join('.');
+          console.log(segmentList, 'segmentList', 'accStructure', accStructure);
+          return (
+            <Tooltip
+              position="top"
+              trigger="hover"
+              content={segmentList.join('.')}
+            >
+              {segmentList.join('.')}
+            </Tooltip>
+          );
         },
         width: 300,
       },
@@ -163,12 +172,14 @@ function PersonnelSearch() {
         ),
       },
     ],
-    []
+    [accStructure]
   );
 
   useEffect(() => {
-    fetchData();
-  }, [pagination.current, pagination.pageSize, formParams]);
+    if (accStructure) {
+      fetchData();
+    }
+  }, [pagination.current, pagination.pageSize, formParams, accStructure]);
 
   function fetchData() {
     const { current, pageSize } = pagination;
