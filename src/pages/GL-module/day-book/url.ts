@@ -8,6 +8,7 @@ const Url = {
   insertGlJeHeaders: `${prefix}/gl/insertGlJeHeaders`,
   updateGlJeHeaders: `${prefix}/gl/updateGlJeHeaders`,
   searchGlJeBatches: `${prefix}/gl/searchGlJeBatches`,
+  getExchangeRate: `${prefix}/gl/getExchangeRate`,
 };
 
 export default Url;

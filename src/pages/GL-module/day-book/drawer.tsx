@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import {
   Form,
   Input,
@@ -28,59 +28,14 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
   const { visible, handleClose, row } = props;
 
   const [form] = useForm();
-  const accBookDict: any = Form.useFormState('accBookDictCode', form) || null;
-  const currencyCode: any = Form.useFormState('currencyCode', form) || null;
+
   const periodName: any = Form.useFormState('periodName', form) || null;
 
-  useEffect(() => {
-    console.log(periodName, 'periodName');
-    if (!periodName?.value) {
-      form.setFieldValue('accBookDictCode', null);
-    }
-  }, [periodName?.value, form, periodName]);
+  const dCurrencyCode = useRef(null);
 
-  const defaultCurrencyCode = useMemo(() => {
-    if (accBookDict?.value) {
-      const v =
-        accBookDict.value?.attributeData?.find((attr) => {
-          return attr.attribute === 'attribute2';
-        }) || {};
-      return v?.attributeData?.[0]?.dictCode;
-    } else {
-      form.setFieldsValue({
-        currencyCode: null,
-        exchangeRateTypeDictCode: null,
-        exchangeRateTime: null,
-        exchangeRate: null,
-      });
-    }
-    return null;
-  }, [accBookDict]);
-
-  const sameCurrency = useMemo(() => {
-    console.log(currencyCode, 'currencyCode');
-    if (
-      currencyCode?.value &&
-      defaultCurrencyCode &&
-      currencyCode?.value === defaultCurrencyCode
-    ) {
-      return true;
-    }
-    return false;
-  }, [currencyCode, defaultCurrencyCode]);
-
-  useEffect(() => {
-    if (sameCurrency) {
-      form.setFieldsValue({
-        exchangeRateTypeDictCode: {
-          value: 'User',
-          label: '用户自定义汇率类型',
-        },
-        exchangeRateTime: dayjs(periodName?.value),
-        exchangeRate: '1.00',
-      });
-    }
-  }, [sameCurrency]);
+  // const [accBookDict, setAccBookDict] = useState(null);
+  // const [currencyCode, setCurrencyCode] = useState(null);
+  // const [periodName]: any = Form.useFormState('periodName', form) || null;
 
   const handleSubmit = async () => {
     const data = form.getFields();
@@ -151,9 +106,8 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         },
         ...others,
       });
-      console.log(periodName, 'init');
     }
-  }, []);
+  }, [form, row]);
 
   return (
     <Drawer
@@ -185,7 +139,9 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
               accBookDictCode: 'PRC',
             })}
             onChange={(v) => {
-              console.log(v, 'v');
+              if (!v) {
+                form.setFieldValue('accBookDictCode', null);
+              }
             }}
             labelValue="value"
             allowClear
@@ -194,18 +150,48 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         <Form.Item
           label="账套"
           field="accBookDictCode"
+          shouldUpdate
           rules={[{ required: true, message: '必填' }]}
         >
-          <FormSelect
-            showSearch
-            disabled={!periodName?.value}
-            onFetchData={DataFetch(Url.searchDictValues, {
-              dictType: 'ACC_BOOK',
-            })}
-            labelInValue
-            renderLabel={(v) => `${v.value}/${v.label}`}
-            allowClear
-          />
+          {(formData, form) => {
+            console.log(formData, form, 'formData, form');
+            const { periodName } = formData;
+            return (
+              <FormSelect
+                showSearch
+                disabled={!periodName}
+                onFetchData={DataFetch(Url.searchDictValues, {
+                  dictType: 'ACC_BOOK',
+                })}
+                onChange={(v) => {
+                  if (v) {
+                    const data =
+                      v.attributeData?.find((attr) => {
+                        return attr.attribute === 'attribute2';
+                      }) || {};
+                    dCurrencyCode.current = data?.attributeData?.[0]?.dictCode;
+                    if (!dCurrencyCode.current) {
+                      Notification.error({
+                        title: '失败',
+                        content: '账套未配置币种',
+                      });
+                    }
+                  } else {
+                    form.setFieldsValue({
+                      currencyCode: null,
+                      exchangeRateTypeDictCode: null,
+                      exchangeRateTime: null,
+                      exchangeRate: null,
+                    });
+                    dCurrencyCode.current = null;
+                  }
+                }}
+                labelInValue
+                renderLabel={(v) => `${v.value}/${v.label}`}
+                allowClear
+              />
+            );
+          }}
         </Form.Item>
         <Form.Item label="日记账批名" field="jeBatchId">
           <FormSelect
@@ -255,52 +241,136 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         <Form.Item
           label="币种"
           field="currencyCode"
+          shouldUpdate
           rules={[{ required: true, message: '必填' }]}
         >
-          <FormSelect
-            showSearch
-            disabled={!accBookDict?.value}
-            onFetchData={DataFetch(Url.searchDictValues, {
-              dictType: 'CURRENCY',
-            })}
-            renderLabel={(v) => `${v.value}/${v.label}`}
-            allowClear
-          />
+          {(formData, form) => {
+            const { accBookDictCode } = formData;
+            return (
+              <FormSelect
+                showSearch
+                disabled={!accBookDictCode}
+                onFetchData={DataFetch(Url.searchDictValues, {
+                  dictType: 'CURRENCY',
+                })}
+                onChange={(v) => {
+                  if (v && v === dCurrencyCode.current) {
+                    form.setFieldsValue({
+                      exchangeRateTypeDictCode: {
+                        value: 'User',
+                        label: '用户自定义汇率类型',
+                      },
+                      exchangeRateTime: dayjs(periodName?.value),
+                      exchangeRate: '1.00',
+                    });
+                  } else {
+                    form.setFieldsValue({
+                      exchangeRateTypeDictCode: null,
+                      exchangeRateTime: null,
+                      exchangeRate: null,
+                    });
+                  }
+                }}
+                renderLabel={(v) => `${v.value}/${v.label}`}
+                allowClear
+              />
+            );
+          }}
         </Form.Item>
         <Form.Item
           label="汇率类型"
           field="exchangeRateTypeDictCode"
+          shouldUpdate
           rules={[{ required: true, message: '必填' }]}
         >
-          <FormSelect
-            showSearch
-            disabled={!accBookDict?.value || sameCurrency}
-            onFetchData={DataFetch(Url.searchDictValues, {
-              dictType: 'EXCHANGE_RATE_TYPE',
-            })}
-            labelInValue
-            allowClear
-          />
+          {(formData) => {
+            const { accBookDictCode, currencyCode } = formData;
+            const sameCurrency = currencyCode === dCurrencyCode.current;
+            return (
+              <FormSelect
+                showSearch
+                disabled={!accBookDictCode || !currencyCode || sameCurrency}
+                onFetchData={DataFetch(Url.searchDictValues, {
+                  dictType: 'EXCHANGE_RATE_TYPE',
+                })}
+                labelInValue
+                allowClear
+              />
+            );
+          }}
         </Form.Item>
 
         <Form.Item
           label="汇率日期"
           field="exchangeRateTime"
+          shouldUpdate
           rules={[{ required: true, message: '必填' }]}
         >
-          <DatePicker disabled={!accBookDict?.value || sameCurrency} />
+          {(formData) => {
+            const { accBookDictCode, currencyCode, exchangeRateTypeDictCode } =
+              formData;
+            console.log(formData, 'formData1111');
+            const sameCurrency = currencyCode === dCurrencyCode.current;
+            return (
+              <DatePicker
+                disabled={!accBookDictCode || !currencyCode || sameCurrency}
+                onChange={(v) => {
+                  if (
+                    v &&
+                    exchangeRateTypeDictCode?.value &&
+                    currencyCode &&
+                    dCurrencyCode.current
+                  ) {
+                    $fetch(Url.getExchangeRate, {
+                      exchangeRateTime: dayjs(v).valueOf(),
+                      currencyFrom: currencyCode,
+                      currencyTo: dCurrencyCode.current,
+                      exchangeRateTypeDictCode: exchangeRateTypeDictCode?.value,
+                      page: { pageNo: 1, pageSize: 20 },
+                    }).then((res) => {
+                      const { pageList } = res;
+                      if (pageList.length) {
+                        const { exchangeRate } = pageList?.[0];
+                        form.setFieldValue('exchangeRate', exchangeRate);
+                      } else {
+                        Notification.error({
+                          title: '失败',
+                          content: '汇率未维护',
+                        });
+                      }
+                    });
+                  }
+                }}
+              />
+            );
+          }}
         </Form.Item>
         <Form.Item
           label="汇率"
           field="exchangeRate"
+          shouldUpdate
           rules={[{ required: true, message: '必填' }]}
         >
-          <InputNumber
-            disabled={!accBookDict?.value || sameCurrency}
-            min={0}
-            step={0.000001}
-            precision={1}
-          />
+          {(formData) => {
+            const { accBookDictCode, currencyCode, exchangeRateTypeDictCode } =
+              formData;
+            const sameCurrency = currencyCode === dCurrencyCode.current;
+            return (
+              <InputNumber
+                disabled={
+                  !accBookDictCode ||
+                  !currencyCode ||
+                  sameCurrency ||
+                  ['Average Rate', 'END Rate'].includes(
+                    exchangeRateTypeDictCode?.value
+                  )
+                }
+                min={0}
+                step={0.000001}
+                precision={1}
+              />
+            );
+          }}
         </Form.Item>
       </Form>
     </Drawer>
