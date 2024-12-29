@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   Form,
   Input,
@@ -28,6 +28,59 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
   const { visible, handleClose, row } = props;
 
   const [form] = useForm();
+  const accBookDict: any = Form.useFormState('accBookDictCode', form) || null;
+  const currencyCode: any = Form.useFormState('currencyCode', form) || null;
+  const periodName: any = Form.useFormState('periodName', form) || null;
+
+  useEffect(() => {
+    console.log(periodName, 'periodName');
+    if (!periodName?.value) {
+      form.setFieldValue('accBookDictCode', null);
+    }
+  }, [periodName?.value, form, periodName]);
+
+  const defaultCurrencyCode = useMemo(() => {
+    if (accBookDict?.value) {
+      const v =
+        accBookDict.value?.attributeData?.find((attr) => {
+          return attr.attribute === 'attribute2';
+        }) || {};
+      return v?.attributeData?.[0]?.dictCode;
+    } else {
+      form.setFieldsValue({
+        currencyCode: null,
+        exchangeRateTypeDictCode: null,
+        exchangeRateTime: null,
+        exchangeRate: null,
+      });
+    }
+    return null;
+  }, [accBookDict]);
+
+  const sameCurrency = useMemo(() => {
+    console.log(currencyCode, 'currencyCode');
+    if (
+      currencyCode?.value &&
+      defaultCurrencyCode &&
+      currencyCode?.value === defaultCurrencyCode
+    ) {
+      return true;
+    }
+    return false;
+  }, [currencyCode, defaultCurrencyCode]);
+
+  useEffect(() => {
+    if (sameCurrency) {
+      form.setFieldsValue({
+        exchangeRateTypeDictCode: {
+          value: 'User',
+          label: '用户自定义汇率类型',
+        },
+        exchangeRateTime: dayjs(periodName?.value),
+        exchangeRate: '1.00',
+      });
+    }
+  }, [sameCurrency]);
 
   const handleSubmit = async () => {
     const data = form.getFields();
@@ -98,6 +151,7 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         },
         ...others,
       });
+      console.log(periodName, 'init');
     }
   }, []);
 
@@ -130,6 +184,9 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
               appModuleDictCode: 'GL',
               accBookDictCode: 'PRC',
             })}
+            onChange={(v) => {
+              console.log(v, 'v');
+            }}
             labelValue="value"
             allowClear
           />
@@ -141,6 +198,7 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         >
           <FormSelect
             showSearch
+            disabled={!periodName?.value}
             onFetchData={DataFetch(Url.searchDictValues, {
               dictType: 'ACC_BOOK',
             })}
@@ -154,7 +212,7 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
             showSearch
             onFetchData={DataFetch(Url.searchGlJeBatches)}
             keyValue="id"
-            labelValue='label'
+            labelValue="label"
             labelInValue
             allowClear
           />
@@ -201,6 +259,7 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         >
           <FormSelect
             showSearch
+            disabled={!accBookDict?.value}
             onFetchData={DataFetch(Url.searchDictValues, {
               dictType: 'CURRENCY',
             })}
@@ -215,6 +274,7 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         >
           <FormSelect
             showSearch
+            disabled={!accBookDict?.value || sameCurrency}
             onFetchData={DataFetch(Url.searchDictValues, {
               dictType: 'EXCHANGE_RATE_TYPE',
             })}
@@ -228,14 +288,19 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
           field="exchangeRateTime"
           rules={[{ required: true, message: '必填' }]}
         >
-          <DatePicker />
+          <DatePicker disabled={!accBookDict?.value || sameCurrency} />
         </Form.Item>
         <Form.Item
           label="汇率"
           field="exchangeRate"
           rules={[{ required: true, message: '必填' }]}
         >
-          <InputNumber min={0} step={0.000001} precision={1} />
+          <InputNumber
+            disabled={!accBookDict?.value || sameCurrency}
+            min={0}
+            step={0.000001}
+            precision={1}
+          />
         </Form.Item>
       </Form>
     </Drawer>
