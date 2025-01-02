@@ -5,6 +5,8 @@ const Url = {
   searchDictType: `${prefix}/base/searchDictType`,
   glPeriodSearch: `${prefix}/gl/searchDictValues`,
   getPeriod: `${prefix}/gl/getPeriod`,
+  openPeriod: `${prefix}/gl/openPeriod`,
+  closePeriod: `${prefix}/gl/closePeriod`,
 };
 
 export default Url;

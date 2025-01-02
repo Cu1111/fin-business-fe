@@ -147,38 +147,15 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         wrapperCol={{ span: 18 }}
       >
         <Form.Item
-          label="期间"
-          field="periodName"
-          rules={[{ required: true, message: '必填' }]}
-        >
-          <FormSelect
-            showSearch
-            onFetchData={DataFetch(Url.glPeriodSearch, {
-              appModuleDictCode: 'GL',
-              accBookDictCode: 'PRC',
-            })}
-            onChange={(v) => {
-              if (!v) {
-                form.setFieldValue('accBookDictCode', null);
-              }
-            }}
-            labelValue="value"
-            allowClear
-          />
-        </Form.Item>
-        <Form.Item
           label="账套"
           field="accBookDictCode"
           shouldUpdate
           rules={[{ required: true, message: '必填' }]}
         >
           {(formData, form) => {
-            console.log(formData, form, 'formData, form');
-            const { periodName } = formData;
             return (
               <FormSelect
                 showSearch
-                disabled={!periodName}
                 onFetchData={DataFetch(Url.searchDictValues, {
                   dictType: 'ACC_BOOK',
                 })}
@@ -196,14 +173,15 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
                       });
                     }
                   } else {
-                    form.setFieldsValue({
-                      currencyCode: null,
-                      exchangeRateTypeDictCode: null,
-                      exchangeRateTime: null,
-                      exchangeRate: null,
-                    });
                     dCurrencyCode.current = null;
                   }
+                  form.setFieldsValue({
+                    periodName: null,
+                    currencyCode: null,
+                    exchangeRateTypeDictCode: null,
+                    exchangeRateTime: null,
+                    exchangeRate: null,
+                  });
                 }}
                 labelInValue
                 renderLabel={(v) => `${v.value}/${v.label}`}
@@ -212,6 +190,38 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
             );
           }}
         </Form.Item>
+        <Form.Item
+          label="期间"
+          field="periodName"
+          shouldUpdate
+          rules={[{ required: true, message: '必填' }]}
+        >
+          {(formData) => {
+            const { accBookDictCode } = formData;
+            return (
+              <FormSelect
+                showSearch
+                disabled={!accBookDictCode}
+                onFetchData={DataFetch(Url.glPeriodSearch, {
+                  appModuleDictCode: 'GL',
+                  accBookDictCode: 'PRC',
+                  periodStatus: 'O',
+                })}
+                onChange={() => {
+                  form.setFieldsValue({
+                    exchangeRateTypeDictCode: null,
+                    currencyCode: null,
+                    exchangeRateTime: null,
+                    exchangeRate: null,
+                  });
+                }}
+                labelValue="value"
+                allowClear
+              />
+            );
+          }}
+        </Form.Item>
+
         <Form.Item label="日记账批名" field="jeBatchId">
           <FormSelect
             showSearch

@@ -45,6 +45,29 @@ function PersonnelSearch() {
     });
   };
 
+  const trigglePeriod = (row, type: 'OPEN' | 'CLOSE') => {
+    const { periodId, periodName } = row;
+    $fetch(type === 'OPEN' ? Url.openPeriod : Url.closePeriod, {
+      periodId,
+      periodName,
+    })
+      .then(() => {
+        Notification.success({
+          closable: true,
+          title: '成功',
+          content: '操作成功!',
+        });
+        fetchData();
+      })
+      .catch(() => {
+        Notification.error({
+          closable: true,
+          title: '失败',
+          content: '请求失败，请联系管理员。',
+        });
+      });
+  };
+
   const columns = useMemo<Array<TableColumnProps>>(
     () => [
       {
@@ -65,7 +88,13 @@ function PersonnelSearch() {
       },
       {
         title: '期间状态',
-        dataIndex: 'periodName',
+        dataIndex: 'periodStatus',
+        render: (v) => {
+          if (v) {
+            return v === 'N' ? '未开启' : '已开启';
+          }
+          return '-';
+        },
         width: 120,
       },
       {
@@ -101,7 +130,10 @@ function PersonnelSearch() {
               type="primary"
               style={{ marginRight: '6px' }}
               size="small"
-              onClick={handleNoSupport}
+              disabled={row?.periodStatus === 'O'}
+              onClick={() => {
+                trigglePeriod(row, 'OPEN');
+              }}
             >
               打开
             </Button>
@@ -109,7 +141,10 @@ function PersonnelSearch() {
               type="primary"
               style={{ marginRight: '6px' }}
               size="small"
-              onClick={handleNoSupport}
+              disabled={row?.periodStatus === 'N'}
+              onClick={() => {
+                trigglePeriod(row, 'CLOSE');
+              }}
             >
               关闭
             </Button>
@@ -183,8 +218,7 @@ function PersonnelSearch() {
       <SearchForm onSearch={handleSearch} />
 
       <div className={styles['button-group']}>
-        <Space>
-        </Space>
+        <Space></Space>
         <Space>
           <Button icon={<IconDownload />} onClick={handleNoSupport}>
             下载
