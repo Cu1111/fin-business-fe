@@ -35,6 +35,19 @@ function SearchForm(props: {
       >
         <Row gutter={24}>
           <Col span={colSpan}>
+            <Form.Item label="账套" field="accBookDictCode">
+              <FormSelect
+                showSearch
+                onFetchData={DataFetch(Url.searchDictValues, {
+                  dictType: 'ACC_BOOK',
+                })}
+                renderLabel={(v) => `${v.value}/${v.label}`}
+                allowClear
+              />
+            </Form.Item>
+          </Col>
+          
+          <Col span={colSpan}>
             <Form.Item label="期间" field="periodName">
               <FormSelect
                 showSearch
@@ -43,19 +56,6 @@ function SearchForm(props: {
                   accBookDictCode: 'PRC',
                 })}
                 labelValue="value"
-                allowClear
-              />
-            </Form.Item>
-          </Col>
-
-          <Col span={colSpan}>
-            <Form.Item label="账套" field="accBookDictCode">
-              <FormSelect
-                showSearch
-                onFetchData={DataFetch(Url.searchDictValues, {
-                  dictType: 'ACC_BOOK',
-                })}
-                renderLabel={(v) => `${v.value}/${v.label}`}
                 allowClear
               />
             </Form.Item>
@@ -86,10 +86,7 @@ function SearchForm(props: {
             </Form.Item>
           </Col>
           <Col span={colSpan}>
-            <Form.Item
-              label="日记账批名称"
-              field="jeBatchName"
-            >
+            <Form.Item label="日记账批名称" field="jeBatchName">
               <Input allowClear placeholder="请输入" />
             </Form.Item>
           </Col>

@@ -198,13 +198,14 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         >
           {(formData) => {
             const { accBookDictCode } = formData;
+            const { value } = accBookDictCode || {};
             return (
               <FormSelect
                 showSearch
                 disabled={!accBookDictCode}
                 onFetchData={DataFetch(Url.glPeriodSearch, {
                   appModuleDictCode: 'GL',
-                  accBookDictCode: 'PRC',
+                  accBookDictCode: value,
                   periodStatus: 'O',
                 })}
                 onChange={() => {

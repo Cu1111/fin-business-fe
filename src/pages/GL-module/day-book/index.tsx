@@ -63,14 +63,14 @@ function PersonnelSearch() {
   const columns = useMemo<Array<TableColumnProps>>(
     () => [
       {
-        title: '期间',
-        dataIndex: 'periodName',
-        fixed: 'left',
+        title: '账套',
+        dataIndex: 'accBookDesc',
         width: 120,
       },
       {
-        title: '账套',
-        dataIndex: 'accBookDesc',
+        title: '期间',
+        dataIndex: 'periodName',
+        fixed: 'left',
         width: 120,
       },
       {
