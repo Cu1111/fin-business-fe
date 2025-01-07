@@ -20,6 +20,12 @@ import Url from './url';
 
 const { Text } = Typography;
 
+const STATUS_MAP = {
+  N: '未开启',
+  O: '已开启',
+  C: '已关闭',
+};
+
 function PersonnelSearch() {
   const [data, setData] = useState([]);
   const [pagination, setPatination] = useState<PaginationProps>({
@@ -91,7 +97,7 @@ function PersonnelSearch() {
         dataIndex: 'periodStatus',
         render: (v) => {
           if (v) {
-            return v === 'N' ? '未开启' : '已开启';
+            return STATUS_MAP[v] || '-';
           }
           return '-';
         },
@@ -141,7 +147,7 @@ function PersonnelSearch() {
               type="primary"
               style={{ marginRight: '6px' }}
               size="small"
-              disabled={row?.periodStatus === 'N'}
+              disabled={row?.periodStatus === 'C'}
               onClick={() => {
                 trigglePeriod(row, 'CLOSE');
               }}
