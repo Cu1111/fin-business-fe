@@ -113,6 +113,7 @@ function PersonnelSearch() {
               type="primary"
               style={{ marginRight: '6px' }}
               size="small"
+              disabled={!['N', 'E'].includes(row.postStatus)}
               onClick={() => handleEdit(row)}
             >
               编辑
@@ -120,6 +121,7 @@ function PersonnelSearch() {
             <Button
               type="primary"
               size="small"
+              disabled={['P', 'Y'].includes(row.postStatus)}
               onClick={() => {
                 console.log('过账');
               }}

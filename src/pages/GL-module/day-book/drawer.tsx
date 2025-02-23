@@ -181,6 +181,7 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
                     exchangeRateTypeDictCode: null,
                     exchangeRateTime: null,
                     exchangeRate: null,
+                    jeBatchId: null,
                   });
                 }}
                 labelInValue
@@ -214,6 +215,7 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
                     currencyCode: null,
                     exchangeRateTime: null,
                     exchangeRate: null,
+                    jeBatchId: null,
                   });
                 }}
                 labelValue="value"
@@ -224,14 +226,30 @@ const DrawerForm: React.FC<DrawerFormProps> = (props) => {
         </Form.Item>
 
         <Form.Item label="日记账批名" field="jeBatchId">
-          <FormSelect
-            showSearch
-            onFetchData={DataFetch(Url.searchGlJeBatches)}
-            keyValue="id"
-            labelValue="label"
-            labelInValue
-            allowClear
-          />
+          {(formData) => {
+            const { accBookDictCode, periodName } = formData;
+            console.log(
+              'accBookDictCode',
+              accBookDictCode,
+              'periodName',
+              periodName
+            );
+            return (
+              <FormSelect
+                showSearch
+                disabled={!accBookDictCode || !periodName}
+                onFetchData={DataFetch(Url.searchGlJeBatches, {
+                  periodName,
+                  accBookDictCode: accBookDictCode?.value,
+                  postStatusList: ['N', 'E'],
+                })}
+                keyValue="id"
+                labelValue="label"
+                labelInValue
+                allowClear
+              />
+            );
+          }}
         </Form.Item>
         <Form.Item
           label="日记账名称"

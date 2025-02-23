@@ -17,7 +17,7 @@ import {
   IconPlus,
 } from '@arco-design/web-react/icon';
 import { $fetch } from '@/utils';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import GroupDescribe from './groupDescribe';
 import dayjs from 'dayjs';
 import SearchForm from './form';
@@ -37,7 +37,6 @@ function PersonnelSearch() {
     current: 1,
     pageSizeChangeResetCurrent: true,
   });
-  const history = useHistory();
   const [loading, setLoading] = useState(true);
   const [formParams, setFormParams] = useState({});
   const [visible, setVisible] = useState<boolean>(false); // 新增修改弹窗的显示
@@ -47,6 +46,12 @@ function PersonnelSearch() {
   const { jeHeaderId } = useParams();
 
   const rowRef = useRef(null);
+
+  const postStatus = useMemo(() => {
+    return new URLSearchParams(location.search).get('postStatus');
+  }, []);
+
+  console.log(postStatus, 'searchParams');
 
   const handleEdit = (row) => {
     console.log(row, 'row');
@@ -164,6 +169,7 @@ function PersonnelSearch() {
               type="primary"
               style={{ marginRight: '6px' }}
               size="small"
+              disabled={['P', 'Y'].includes(postStatus)}
               onClick={() => handleEdit(row)}
             >
               编辑
@@ -172,7 +178,7 @@ function PersonnelSearch() {
         ),
       },
     ],
-    [accStructure]
+    [accStructure, postStatus]
   );
 
   useEffect(() => {
@@ -240,7 +246,12 @@ function PersonnelSearch() {
 
       <div className={styles['button-group']}>
         <Space>
-          <Button type="primary" icon={<IconPlus />} onClick={handleAdd}>
+          <Button
+            type="primary"
+            icon={<IconPlus />}
+            onClick={handleAdd}
+            disabled={['P', 'Y'].includes(postStatus)}
+          >
             新增
           </Button>
           <Button onClick={handleNoSupport}>批量导入</Button>

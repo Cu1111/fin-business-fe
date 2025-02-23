@@ -55,9 +55,11 @@ function PersonnelSearch() {
     });
   };
 
-  const showDetail = (row) => {
+  const showDetail = (row, postStatus) => {
     const { jeHeaderId } = row;
-    history.push(`/GL-module/day-book-line/${jeHeaderId}`);
+    history.push(
+      `/GL-module/day-book-line/${jeHeaderId}?postStatus=${postStatus}`
+    );
   };
 
   const columns = useMemo<Array<TableColumnProps>>(
@@ -147,6 +149,7 @@ function PersonnelSearch() {
               type="primary"
               style={{ marginRight: '6px' }}
               size="small"
+              disabled={['P', 'Y'].includes(row.postStatus)}
               onClick={() => handleEdit(row)}
             >
               编辑
@@ -155,7 +158,7 @@ function PersonnelSearch() {
               type="primary"
               style={{ marginRight: '6px' }}
               size="small"
-              onClick={() => showDetail(row)}
+              onClick={() => showDetail(row, row.postStatus)}
             >
               日记账行
             </Button>
